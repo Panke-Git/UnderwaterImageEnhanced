@@ -1,0 +1,29 @@
+MODEL:
+  SESSION: "Paxton"
+
+PROJECT:
+  ROOT_PATH: '/root/cyx/CL/PRO/MyPro/UbuntuPro'
+  TRAIN_DIR: '/dataset/LSUIN/Train'
+  VAL_DIR: '/dataset/LSUIN/Val'
+  SAVE_DIR: '/save_dir'
+  EXPT_RECORD_DIR: 'expt_record'
+
+DATASET:
+  INPUT: 'input'
+  TARGET: 'GT'
+
+TRAIN:
+  DEVICE: 'cuda:0'
+  VAL_AFTER_EVERY: 1
+  RESUME: False
+  WEIGHT: ''
+  IMG_H: 256
+  IMG_W: 256
+  ORI: False
+  BATCH_SIZE: 64
+  LR: 2e-4
+  EPOCHS: 200
+  PRINT_FREQ: 1
+
+
+
