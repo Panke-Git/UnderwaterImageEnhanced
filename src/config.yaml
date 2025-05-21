@@ -2,18 +2,20 @@ MODEL:
   SESSION: "Paxton"
 
 PROJECT:
-  ROOT_PATH: '/root/cyx/CL/PRO/MyPro/UbuntuPro'
-  TRAIN_DIR: '/dataset/LSUIN/Train'
-  VAL_DIR: '/dataset/LSUIN/Val'
-  SAVE_DIR: '/save_dir'
-  EXPT_RECORD_DIR: 'expt_record'
+  ROOT_PATH: /root/cyx/CL/PRO/MyPro/UnderwaterImageEnhanced/
+  TRAIN_DIR: /dataset/LSUIN/Train
+  VAL_DIR: /dataset/LSUIN/Val
+  SAVE_DIR: /save_dir
+  EXPT_RECORD_DIR: /expt_record
+  LOG_DIR: /log
+
 
 DATASET:
   INPUT: 'input'
   TARGET: 'GT'
 
 TRAIN:
-  DEVICE: 'cuda:0'
+  DEVICE: 'cuda:2'
   VAL_AFTER_EVERY: 1
   RESUME: False
   WEIGHT: ''

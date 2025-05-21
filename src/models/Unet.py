@@ -32,6 +32,7 @@ class ConvBlock(nn.Module):
 class UNet(nn.Module):
     def __init__(self, in_channels=3, out_channels=3, base_c=64):
         super(UNet, self).__init__()
+        self.model_name = 'UNet'
 
         # Down path
         self.enc1 = ConvBlock(in_channels, base_c)

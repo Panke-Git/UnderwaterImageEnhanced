@@ -6,26 +6,37 @@
     @Email: None
 """
 import os
+from datetime import datetime
 
 import torch
-from mmengine.runner import save_checkpoint
 from torch.utils.data import DataLoader
 from torchmetrics.functional.image import structural_similarity_index_measure, peak_signal_noise_ratio
 from tqdm import tqdm
 
-from src.utils.train_utils import seed_everything
-from src.utils.config import Config
 from src.data.dataset import DataReader
 from src.models.Unet import UNet
+from src.utils import record_utils
+from src.utils.config import Config
+from src.utils.train_utils import ExperimentLogger
+from src.utils.train_utils import seed_everything
 
 
 def train():
     config = Config.load('config.yaml')
-    seed_everything()
+    # 开始时间
+    start_time = datetime.now().strftime('%Y%m%d_%H%M%S')
+    # 注册log输出
+    logger = ExperimentLogger(config.PROJECT.LOG_DIR, start_time)
+    # 设置随机种子
+    seed_everything(3407)
+    # 项目根路径，训练数据集路径，验证数据集路径
     root_path = config.PROJECT.ROOT_PATH
     train_dir = os.path.join(root_path, config.PROJECT.TRAIN_DIR)
+    print(train_dir)
     val_dir = os.path.join(root_path, config.PROJECT.VAL_DIR)
+    # 训练设备
     device = torch.device(config.TRAIN.DEVICE if torch.cuda.is_available() else 'cpu')
+
     train_dataset = DataReader(img_dir=train_dir,
                                input=config.DATASET.INPUT,
                                target=config.DATASET.TARGET,
@@ -47,19 +58,48 @@ def train():
                             batch_size=config.TRAIN.BATCH_SIZE,
                             shuffle=False,
                             pin_memory=True, )
+
+    # ============================================
+    # ================注意修改此值==================
+    # ============================================
     model = UNet().to(device)
+    model_description = '基础Unet模型'
+    # ============================================
+    # ============================================
+    # ============================================
+
     epochs = config.TRAIN.EPOCHS
 
     criterion_psnr = torch.nn.SmoothL1Loss()
 
-    optimizer_b = torch.optim.Adam(model.parameters(), lr=config.TRAIN.LR, betas=(0.9, 0.999), eps=1e-08)
+    optimizer_b = torch.optim.AdamW(model.parameters(), lr=float(config.TRAIN.LR), betas=(0.9, 0.999), eps=1e-08)
     scheduler_b = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer_b, epochs, eta_min=1e-6, last_epoch=-1)
+
+    # 创建本次训练需要保存数据的路径；
+    record_path, best_path = record_utils.make_train_path(config.PROJECT.EXPT_RECORD_DIR, model.model_name, start_time)
+
+    config_file_path = record_utils.save_train_config(record_path,
+                                                      model=model.model_name,
+                                                      model_description=model_description,
+                                                      batch_size=config.TRAIN.BATCH_SIZE,
+                                                      lr=float(config.TRAIN.LR),
+                                                      epochs=epochs,
+                                                      scheduler=str(scheduler_b),
+                                                      optimizer=str(optimizer_b),
+                                                      dataset=train_dir,
+                                                      )
+    print("配置信息保存至: ", config_file_path, "下!")
 
     best_psnr_epoch = 1
     best_psnr = 0
 
-    size = len(train_loader)
+    top_psnr = 0.0
+    top_ssim = 0.0
+    sum_psnr_ssim = 0.0
+    top_data = None
+    total_record = []
 
+    size = len(train_loader)
     for epoch in range(1, epochs + 1):
         model.train()
 
@@ -77,27 +117,100 @@ def train():
             train_loss.backward()
             optimizer_b.step()
         scheduler_b.step()
+        logger.writer.add_scalar('train/loss', train_loss.item(), epoch)
 
         if epoch % config.TRAIN.PRINT_FREQ == 0:
             model.eval()
+            val_loss = 0.0
             psnr_total = ssim_total = 0.0
             size = len(val_loader)
+            metrics = None
             with torch.no_grad():
                 for data in tqdm(val_loader):
                     inp, target = data[0].to(device), data[1].to(device)
                     res = model(inp)
-                    psnr_total += peak_signal_noise_ratio(res, target, data_range=1).item()
-                    ssim_total += structural_similarity_index_measure(res, target, data_range=1).item()
+                    val_loss = criterion_psnr(res, target)
+                    psnr = peak_signal_noise_ratio(res, target, data_range=1).item()
+                    psnr_total += psnr
+                    ssim = structural_similarity_index_measure(res, target, data_range=1).item()
+                    ssim_total += ssim
+
             psnr = psnr_total / size
             ssim = ssim_total / size
+            metrics = {
+                'PSNR': psnr,
+                'SSIM': ssim,
+            }
 
-            if psnr > best_psnr:
-                best_psnr = psnr
-                best_psnr_epoch = epoch
-                save_checkpoint()
+            epoch_record = record_utils.package_one_epoch(epoch=epoch + 1,
+                                                          train_loss=float(train_loss),
+                                                          val_loss=float(val_loss),
+                                                          val_psnr=float(psnr),
+                                                          val_ssim=float(ssim))
+            total_record.append(epoch_record)
+
+            logger.log_metrics({'loss': val_loss}, epoch, 'val')
+            logger.log_metrics({'psnr': psnr}, epoch, 'val')
+
+            if metrics['PSNR'] > top_psnr:
+                top_psnr = metrics['PSNR']
+                top_psnr_path = os.path.join(best_path, f'TOP_PSNR.pth')
+                top_psnr_data = {
+                    'epoch': epoch,
+                    'train_loss': float(train_loss),
+                    'val_loss': float(val_loss),
+                    'psnr': float(psnr),
+                    'ssim': float(ssim),
+                }
+                torch.save(model.state_dict(), top_psnr_path)
+
+            if metrics['SSIM'] > top_ssim:
+                top_ssim = metrics['SSIM']
+                top_ssim_path = os.path.join(best_path, f'TOP_SSIM.pth')
+                top_ssim_data = {
+                    'epoch': epoch,
+                    'train_loss': float(train_loss),
+                    'val_loss': float(val_loss),
+                    'psnr': float(psnr),
+                    'ssim': float(ssim),
+                }
+                torch.save(model.state_dict(), top_ssim_path)
+
+            if metrics['PSNR'] + metrics['SSIM'] * 100 > sum_psnr_ssim:
+                sum_psnr_ssim = metrics['PSNR'] + metrics['SSIM'] * 100
+                sum_path = os.path.join(best_path, f'TOP_SUM.pth')
+                top_sum_data = {
+                    'epoch': epoch,
+                    'train_loss': float(train_loss),
+                    'val_loss': float(val_loss),
+                    'psnr': float(psnr),
+                    'ssim': float(ssim),
+                }
+                torch.save(model.state_dict(), sum_path)
+
+            top_data = {
+                'PSNR': {
+                    'top_psnr': float(top_psnr),
+                    'top_psnr_data': top_psnr_data,
+                },
+                'SSIM': {
+                    'top_ssim': float(top_ssim),
+                    'top_ssim_data': top_ssim_data
+                },
+                'SUM': {
+                    'top_sum': float(sum_psnr_ssim),
+                    'top_sum_data': top_sum_data
+                }
+            }
+
             print(f'epoch: {epoch}/{epochs}, PSNR: {psnr:.4f}, SSIM: {ssim:.4f},'
                   f'Best PSNR: {best_psnr:.4f}, Best PSNR_epoch: {best_psnr_epoch}'
                   f'LR: {optimizer_b.param_groups[0]["lr"]:.4f}')
+
+    end_time = datetime.now().strftime('%Y%m%d_%H%M%S')
+    excel_path, json_path, top_path = record_utils.save_train_data(record_path, start_time, end_time, total_record,
+                                                                   top_data)
+    print(f'数据已保存: \n \t Excel: {excel_path} \n \t Json: {json_path} \n \t Top: {top_path}')
 
 
 if __name__ == '__main__':
