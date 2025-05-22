@@ -31,23 +31,22 @@ def train():
     seed_everything(3407)
     # 项目根路径，训练数据集路径，验证数据集路径
     root_path = config.PROJECT.ROOT_PATH
-    train_dir = os.path.join(root_path, config.PROJECT.TRAIN_DIR)
-    print(train_dir)
-    val_dir = os.path.join(root_path, config.PROJECT.VAL_DIR)
+    train_dir = config.PROJECT.TRAIN_DIR
+    val_dir = config.PROJECT.VAL_DIR
     # 训练设备
     device = torch.device(config.TRAIN.DEVICE if torch.cuda.is_available() else 'cpu')
 
     train_dataset = DataReader(img_dir=train_dir,
                                input=config.DATASET.INPUT,
                                target=config.DATASET.TARGET,
-                               model='train',
+                               mode='train',
                                ori=True,
                                img_options={'w': config.TRAIN.IMG_W, 'h': config.TRAIN.IMG_H})
     val_dataset = DataReader(img_dir=val_dir,
                              input=config.DATASET.INPUT,
                              target=config.DATASET.TARGET,
-                             model='test',
-                             ori=True,
+                             mode='test',
+                             ori=False,
                              img_options={'w': config.TRAIN.IMG_W, 'h': config.TRAIN.IMG_H})
 
     train_loader = DataLoader(train_dataset,
@@ -102,7 +101,6 @@ def train():
     size = len(train_loader)
     for epoch in range(1, epochs + 1):
         model.train()
-
         for _, data in enumerate(tqdm(train_loader)):
             inp, target = data[0].to(device), data[1].to(device)
 
@@ -142,7 +140,7 @@ def train():
                 'SSIM': ssim,
             }
 
-            epoch_record = record_utils.package_one_epoch(epoch=epoch + 1,
+            epoch_record = record_utils.package_one_epoch(epoch=epoch,
                                                           train_loss=float(train_loss),
                                                           val_loss=float(val_loss),
                                                           val_psnr=float(psnr),
@@ -204,7 +202,7 @@ def train():
             }
 
             print(f'epoch: {epoch}/{epochs}, PSNR: {psnr:.4f}, SSIM: {ssim:.4f},'
-                  f'Best PSNR: {best_psnr:.4f}, Best PSNR_epoch: {best_psnr_epoch}'
+                  f'Best PSNR: {best_psnr:.4f}, Best PSNR_epoch: {best_psnr_epoch}, '
                   f'LR: {optimizer_b.param_groups[0]["lr"]:.4f}')
 
     end_time = datetime.now().strftime('%Y%m%d_%H%M%S')

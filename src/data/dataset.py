@@ -21,7 +21,7 @@ def is_image_file(filename):
 
 
 class DataReader(Dataset):
-    def __init__(self, img_dir, input='input', target='GT', model='train', ori=False, img_options=None):
+    def __init__(self, img_dir, input='input', target='GT', mode='train', ori=False, img_options=None):
         super(DataReader, self).__init__()
         print('img_dir', img_dir)
         input_files = sorted(os.listdir(os.path.join(img_dir, input)))
@@ -29,11 +29,11 @@ class DataReader(Dataset):
 
         self.input_filenames = [os.path.join(img_dir, input, x) for x in input_files if is_image_file(x)]
         self.target_filenames = [os.path.join(img_dir, target, x) for x in target_files if is_image_file(x)]
-        self.model = model
+        self.mode = mode
         self.img_options = img_options
         self.sizex = len(self.input_filenames)
 
-        if self.model == 'train':
+        if self.mode == 'train':
             self.transform = A.Compose([
                 A.OneOf([
                     A.HorizontalFlip(p=1.0),
@@ -123,7 +123,7 @@ class DataReader(Dataset):
 
     def get_labels(self):
         labels = []
-        for filename in self.inp_filenames:
+        for filename in self.input_filenames:
             label = None
             if 'uieb' in filename:
                 label = 0
@@ -137,8 +137,8 @@ class DataReader(Dataset):
         return labels
 
     def load(self, index_):
-        inp_path = self.inp_filenames[index_]
-        tar_path = self.tar_filenames[index_]
+        inp_path = self.input_filenames[index_]
+        tar_path =  self.target_filenames[index_]
 
         inp_img = Image.open(inp_path).convert('RGB')
         tar_img = Image.open(tar_path).convert('RGB')
