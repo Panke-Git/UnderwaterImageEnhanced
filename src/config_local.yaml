@@ -1,0 +1,31 @@
+MODEL:
+  SESSION: "Paxton"
+
+PROJECT:
+  ROOT_PATH: E:\PythonProject\01_Personal\UnderwaterImageEnhanced\
+  TRAIN_DIR: E:\PythonProject\01_Personal\UnderwaterImageEnhanced\dataset\LSUIN\Train
+  VAL_DIR: E:\PythonProject\01_Personal\UnderwaterImageEnhanced\dataset\LSUIN\Val
+  SAVE_DIR: E:\PythonProject\01_Personal\UnderwaterImageEnhanced\save_dir
+  EXPT_RECORD_DIR: E:\PythonProject\01_Personal\UnderwaterImageEnhanced\expt_record
+  LOG_DIR: E:\PythonProject\01_Personal\UnderwaterImageEnhanced\log
+
+
+DATASET:
+  INPUT: 'input'
+  TARGET: 'GT'
+
+TRAIN:
+  DEVICE: 'cuda:0'
+  VAL_AFTER_EVERY: 1
+  RESUME: False
+  WEIGHT: ''
+  IMG_H: 256
+  IMG_W: 256
+  ORI: False
+  BATCH_SIZE: 16
+  LR: 2e-4
+  EPOCHS: 200
+  PRINT_FREQ: 1
+
+
+

@@ -5,6 +5,7 @@
     @Time: 2025/5/20 22:37
     @Email: None
 """
+from datetime import datetime
 import os
 import random
 import torch
@@ -54,6 +55,9 @@ class ExperimentLogger:
             best_path = os.path.join(self.ckpt_dir, 'best_model.pth')
             torch.save(model.state_dict(), best_path)
 
+def generate_experiment_id(model='UShape', dataset='UIEB', loss='L1SSIM', note=''):
+    time_str = datetime.now().strftime('%m%d-%H%M')
+    return f"{time_str}-{model}-{dataset}-{loss}{('-' + note) if note else ''}"
 
 
 

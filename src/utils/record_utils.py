@@ -39,15 +39,24 @@ def save_train_data(target_path, start_time, end_time, list_data, top_data):
     # 保存数据到Excel文件
     records = [json.loads(item) for item in list_data]
     df = pd.DataFrame(records)
-    excel_name = 'Trian_' + '_' + start_time + '——' + end_time + '.xlsx'
+    excel_name = 'Trian.xlsx'
 
     if not os.path.exists(target_path):
         os.makedirs(target_path)
     excel_path = os.path.join(target_path, excel_name)
     df.to_excel(str(excel_path), index=False, sheet_name='Train_data')
 
+    # 单纯的用文件名记录训练的时间
+    time_file = f'{start_time}-{end_time}.txt'
+    if not os.path.exists(target_path):
+        os.makedirs(target_path)
+    time_file_path = os.path.join(target_path, time_file)
+    with open(time_file_path, 'w', encoding='utf-8') as f:
+        f.write(f'{start_time}-{end_time}')
+    f.close()
+
     # 保存数据到JSON文件
-    json_name = 'Trian_' + '_' + start_time + '——' + end_time + '.json'
+    json_name = 'Trian.json'
     if not os.path.exists(target_path):
         os.makedirs(target_path)
     json_path = os.path.join(target_path, json_name)

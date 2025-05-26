@@ -29,7 +29,7 @@ warnings.filterwarnings("ignore", message="Error fetching version info")
 
 
 def train():
-    config = Config.load('config.yaml')
+    config = Config.load('config2.yaml')
     show_banner()
     # 开始时间
     start_time = datetime.now().strftime('%Y%m%d_%H%M%S')
@@ -69,8 +69,8 @@ def train():
     # ========================================================================================
     # ==================================注意修改此值============================================
     # ========================================================================================
-    model = models.UNet_CSC_V4().to(device)
-    model_description = 'Unet x1 输出通过CSC Block之后再进行跳跃连接，CSC Ker=31'
+    model = models.UNet_CSC_V3().to(device)
+    model_description = 'Unet x4输出[512,16,16]后加csc block，再使用卷积卷到[1024,16,16],CSC的Ker改为16'
     expt_id = generate_experiment_id(model=model.model_name,
                                      dataset='LSUI',
                                      loss='SmoothL1Loss',

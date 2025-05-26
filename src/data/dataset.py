@@ -23,7 +23,6 @@ def is_image_file(filename):
 class DataReader(Dataset):
     def __init__(self, img_dir, input='input', target='GT', mode='train', ori=False, img_options=None):
         super(DataReader, self).__init__()
-        print('img_dir', img_dir)
         input_files = sorted(os.listdir(os.path.join(img_dir, input)))
         target_files = sorted(os.listdir(os.path.join(img_dir, target)))
 
