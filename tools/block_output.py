@@ -15,7 +15,7 @@ from src import models
 x = torch.randn(1, 3, 256, 256)
 
 # block = CSC_block(3)
-unet = models.UNet_CSC_V3(in_channels=3, out_channels=3, base_c=64)
+unet = models.UNet_DWT_V1(in_channels=3, out_channels=3, base_c=64)
 
 
 out = unet(x)

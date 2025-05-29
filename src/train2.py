@@ -69,8 +69,8 @@ def train():
     # ========================================================================================
     # ==================================注意修改此值============================================
     # ========================================================================================
-    model = models.UNet_CSC_V3().to(device)
-    model_description = 'Unet x4输出[512,16,16]后加csc block，再使用卷积卷到[1024,16,16],CSC的Ker改为16'
+    model = models.UNet_DWT_V2().to(device)
+    model_description = 'Unet x1输出之后经过基于小波变换的模块，模块详情：1.对特征图使用DWT；2.对LL使用自适应直方图；3.高频分量增强清晰度；并添加了残差，小波模块为x1_1, 整体输出为x1+x1_1'
     expt_id = generate_experiment_id(model=model.model_name,
                                      dataset='LSUI',
                                      loss='SmoothL1Loss',
