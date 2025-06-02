@@ -12,12 +12,18 @@ from torch import nn
 
 from src import models
 
-x = torch.randn(1, 3, 256, 256)
+from src.models.Unet_HybridAttention import HybridAttention
+
+
+x = torch.randn(1, 3, 256, 256).to(torch.device('cuda:0'))
 
 # block = CSC_block(3)
-unet = models.UNet_DWT_V1(in_channels=3, out_channels=3, base_c=64)
+unet = models.UNetHybridAttention(in_channels=3, out_channels=3, base_c=64).to(torch.device('cuda:0'))
+# net = HybridAttention(64).to(torch.device('cuda:0'))
 
 
+# print(x.shape)
 out = unet(x)
+# print(out.shape)
 
 

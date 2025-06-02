@@ -69,8 +69,8 @@ def train():
     # ========================================================================================
     # ==================================注意修改此值============================================
     # ========================================================================================
-    model = models.UNet_DWT_V1().to(device)
-    model_description = 'Unet x1输出之后经过基于小波变换的模块，模块详情：1.对特征图使用DWT；2.对LL使用自适应直方图；3.高频分量增强清晰度；'
+    model = models.UNetHybridAttention().to(device)
+    model_description = 'Unet 使用自己写的HybridAttention,替换第一个enc1层'
     expt_id = generate_experiment_id(model=model.model_name,
                                      dataset='LSUI',
                                      loss='SmoothL1Loss',
