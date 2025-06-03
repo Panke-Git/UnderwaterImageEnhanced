@@ -18,7 +18,7 @@ from src.models.Unet_HybridAttention import HybridAttention
 x = torch.randn(1, 3, 256, 256).to(torch.device('cuda:0'))
 
 # block = CSC_block(3)
-unet = models.UNetHybridAttention(in_channels=3, out_channels=3, base_c=64).to(torch.device('cuda:0'))
+unet = models.UNetHybridAttentionV2(in_channels=3, out_channels=3, base_c=64).to(torch.device('cuda:0'))
 # net = HybridAttention(64).to(torch.device('cuda:0'))
 
 

@@ -30,10 +30,10 @@ class ConvBlock(nn.Module):
         return self.double_conv(x)
 
 
-class UNetHybridAttention(nn.Module):
+class UNetHybridAttentionV2(nn.Module):
     def __init__(self, in_channels=3, out_channels=3, base_c=64):
-        super(UNetHybridAttention, self).__init__()
-        self.model_name = 'UNetHybridAttention'
+        super(UNetHybridAttentionV2, self).__init__()
+        self.model_name = 'UNetHybridAttentionV2'
 
         self.conv1 = nn.Conv2d(in_channels, base_c, kernel_size=3, padding=1)
         self.bn1 = nn.BatchNorm2d(base_c)
@@ -112,8 +112,8 @@ class HybridAttention(nn.Module):
         self.threshold = threshold if isinstance(threshold, float) else nn.Parameter(torch.tensor(threshold))
         self.alpha = nn.Parameter(torch.zeros(dim, 1, 1))
 
-        self.norm1 = LayerNorm2d(dim)
-        self.norm2 = LayerNorm2d(dim)
+        self.norm1 = LayerNorm(dim=dim, mode='biasfree')
+        self.norm2 = LayerNorm(dim=dim, mode='biasfree')
         self.avg_pool = nn.AdaptiveAvgPool2d((1, 1))
 
         self.dw_ffn = DW_FFN(dim)
@@ -152,14 +152,55 @@ class DW_FFN(nn.Module):
         return self.project(self.act(self.depthwise(self.expand(x))))
 
 
-class LayerNorm2d(nn.Module):
-    def __init__(self, num_channels, eps=1e-5):
-        super().__init__()
-        self.norm = nn.LayerNorm(num_channels, eps=eps)
+def to_3d(x):
+    B, C, H, W = x.shape
+    return x.view(B, C, -1).transpose(1, 2)  # [B, H*W, C]
+
+
+def to_4d(x, H, W):
+    B, N, C = x.shape
+    return x.transpose(1, 2).view(B, C, H, W)  # [B, C, H, W]
+
+
+# ---- Bias-Free LayerNorm (only divides by std, no bias, no mean subtraction) ----
+class BiasFree_LayerNorm(nn.Module):
+    def __init__(self, normalized_shape):
+        super(BiasFree_LayerNorm, self).__init__()
+        if isinstance(normalized_shape, int):
+            normalized_shape = (normalized_shape,)
+        self.weight = nn.Parameter(torch.ones(normalized_shape))
 
     def forward(self, x):
-        # x: (B, C, H, W) → (B, H, W, C) → LN → (B, C, H, W)
-        x = x.permute(0, 2, 3, 1)
-        x = self.norm(x)
-        x = x.permute(0, 3, 1, 2)
-        return x
+        sigma = x.var(dim=-1, keepdim=True, unbiased=False)
+        return x / torch.sqrt(sigma + 1e-5) * self.weight
+
+
+# ---- Full LayerNorm with mean and bias ----
+class WithBias_LayerNorm(nn.Module):
+    def __init__(self, normalized_shape):
+        super(WithBias_LayerNorm, self).__init__()
+        if isinstance(normalized_shape, int):
+            normalized_shape = (normalized_shape,)
+        self.weight = nn.Parameter(torch.ones(normalized_shape))
+        self.bias = nn.Parameter(torch.zeros(normalized_shape))
+
+    def forward(self, x):
+        mu = x.mean(dim=-1, keepdim=True)
+        sigma = x.var(dim=-1, keepdim=True, unbiased=False)
+        return (x - mu) / torch.sqrt(sigma + 1e-5) * self.weight + self.bias
+
+
+# ---- Wrapper: choose mode='bias' or 'biasfree' ----
+class LayerNorm(nn.Module):
+    def __init__(self, dim, mode='biasfree'):
+        super(LayerNorm, self).__init__()
+        if mode == 'biasfree':
+            self.norm = BiasFree_LayerNorm(dim)
+        elif mode == 'bias':
+            self.norm = WithBias_LayerNorm(dim)
+        else:
+            raise ValueError(f"Unsupported LayerNorm mode: {mode}")
+
+    def forward(self, x):
+        H, W = x.shape[-2:]
+        return to_4d(self.norm(to_3d(x)), H, W)

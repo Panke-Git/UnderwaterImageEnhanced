@@ -69,8 +69,8 @@ def train():
     # ========================================================================================
     # ==================================注意修改此值============================================
     # ========================================================================================
-    model = models.UNetHybridAttention().to(device)
-    model_description = 'Unet 使用自己写的HybridAttention,替换第一个enc1层'
+    model = models.UNetHybridAttentionV2().to(device)
+    model_description = '使用自己设计的HybridAttention替换Unet的第一层'
     expt_id = generate_experiment_id(model=model.model_name,
                                      dataset='LSUI',
                                      loss='SmoothL1Loss',
@@ -214,10 +214,10 @@ def train():
                 }
             }
 
-            print(f'epoch: {epoch}/{epochs}, PSNR: {psnr:.4f}, SSIM: {ssim:.4f},\n'
-                  f"Best PSNR: {top_psnr_data['psnr']:.4f}, Best PSNR_epoch: {top_psnr_data['epoch']},\n"
-                  f"Best SSIM: {top_ssim_data['ssim']:.4f}, Best SSIM_epoch: {top_ssim_data['epoch']},\n"
-                  f'LR: {optimizer_b.param_groups[0]["lr"]:.4f}')
+            print(f'epoch: {epoch}/{epochs}, PSNR: {psnr:.4f}, SSIM: {ssim:.4f};\n'
+                  f"Best PSNR: {top_psnr_data['psnr']:.4f}, Best PSNR_epoch: {top_psnr_data['epoch']};\n"
+                  f"Best SSIM: {top_ssim_data['ssim']:.4f}, Best SSIM_epoch: {top_ssim_data['epoch']};\n"
+                  f'LR: {optimizer_b.param_groups[0]["lr"]:.6f}')
 
     end_time = datetime.now().strftime('%Y%m%d_%H%M%S')
     excel_path, json_path, top_path = record_utils.save_train_data(record_path, start_time, end_time, total_record,

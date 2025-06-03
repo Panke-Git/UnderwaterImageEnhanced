@@ -23,9 +23,9 @@ TRAIN:
   IMG_H: 256
   IMG_W: 256
   ORI: False
-  BATCH_SIZE: 16
+  BATCH_SIZE: 32
   LR: 2e-4
-  EPOCHS: 200
+  EPOCHS: 500
   PRINT_FREQ: 1
 
 
