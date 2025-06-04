@@ -69,8 +69,8 @@ def train():
     # ========================================================================================
     # ==================================注意修改此值============================================
     # ========================================================================================
-    model = models.UNetHybridAttentionV2().to(device)
-    model_description = '使用自己设计的HybridAttention替换Unet的第一层'
+    model = models.UNetHybridAttentionV3().to(device)
+    model_description = '使用自己设计的HybridAttention替换Unet的第一层，其中HybridAttention中使用了自己设计的BN搭配Conv;'
     expt_id = generate_experiment_id(model=model.model_name,
                                      dataset='LSUI',
                                      loss='SmoothL1Loss',
