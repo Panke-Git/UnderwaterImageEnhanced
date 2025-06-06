@@ -9,10 +9,12 @@
 
 from src.models.LargeKernel.BaseUnet import UIR_PolyKernel
 from src.models.LargeKernel.Unet import UNetLKC
+from src.models.LargeKernel.UnetCSC_LKA_SDCA import UNetCSC_LKA_SDCA
+from src.models.LargeKernel.UnetCSC_LKA_SDCA_FDPA import UNetCSC_LKA_SDCA_FDPA
 from src.models.LargeKernel.Unet_CSC import UnetCSC
 
 
-__all__=['UIR_PolyKernel', 'UNetLKC', 'UnetCSC', 'UNetLKA', 'UNetCSC_LKA']
+__all__=['UIR_PolyKernel', 'UNetLKC', 'UnetCSC', 'UNetLKA', 'UNetCSC_LKA','UNetCSC_LKA_SDCA','UNetCSC_LKA_SDCA_FDPA']
 
 from src.models.LargeKernel.Unet_CSC_LKA import UNetCSC_LKA
 

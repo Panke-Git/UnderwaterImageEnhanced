@@ -30,8 +30,8 @@ warnings.filterwarnings("ignore", message="Error fetching version info")
 
 
 def train():
-    config = Config.load('config.yaml')
-    show_banner()
+    config = Config.load(r'./src/config/config.yaml')
+    # show_banner()
     # 开始时间
     start_time = datetime.now().strftime('%Y%m%d_%H%M%S')
     # 注册log输出
@@ -61,10 +61,12 @@ def train():
     train_loader = DataLoader(train_dataset,
                               batch_size=config.TRAIN.BATCH_SIZE,
                               shuffle=True,
-                              pin_memory=True, )
+                              num_workers=4,
+                              pin_memory=True,)
     val_loader = DataLoader(val_dataset,
                             batch_size=config.TRAIN.BATCH_SIZE,
                             shuffle=False,
+                            num_workers=4,
                             pin_memory=True, )
 
     # ========================================================================================

@@ -30,7 +30,7 @@ warnings.filterwarnings("ignore", message="Error fetching version info")
 
 
 def train():
-    config = Config.load(r'./src/config/config2.yaml')
+    config = Config.load(r'./src/config/config4.yaml')
     # show_banner()
     # 开始时间
     start_time = datetime.now().strftime('%Y%m%d_%H%M%S')
@@ -72,8 +72,8 @@ def train():
     # ========================================================================================
     # ==================================注意修改此值============================================
     # ========================================================================================
-    model = lk.UNetLKA().to(device)
-    model_description = '大核卷积Unet+LKA'
+    model = lk.UNetCSC_LKA_SDCA_FDPA().to(device)
+    model_description = '大核卷积Unet+LKA+SDCA+FDPA'
     expt_id = generate_experiment_id(model=model.model_name,
                                      dataset='LSUI',
                                      loss='SmoothL1Loss',
