@@ -15,6 +15,7 @@ from tqdm import tqdm
 
 from src.data.dataset import DataReader
 from src import models
+from src.models import LargeKernel as lk
 from src.utils import record_utils
 from src.utils.config import Config
 from src.utils.enhance_train_visual import visual_enhance, train_visual
@@ -69,8 +70,8 @@ def train():
     # ========================================================================================
     # ==================================注意修改此值============================================
     # ========================================================================================
-    model = models.UNet_DWT_V2().to(device)
-    model_description = 'Unet x1输出之后经过基于小波变换的模块，模块详情：1.对特征图使用DWT；2.对LL使用自适应直方图；3.高频分量增强清晰度；并添加了残差，小波模块为x1_1, 整体输出为x1+x1_1'
+    model = lk.UNetLKA().to(device)
+    model_description = '大核卷积Unet+LKA'
     expt_id = generate_experiment_id(model=model.model_name,
                                      dataset='LSUI',
                                      loss='SmoothL1Loss',

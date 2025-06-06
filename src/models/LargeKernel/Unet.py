@@ -1,0 +1,82 @@
+"""
+    @Project: UnderwaterImageEnhanced
+    @Author: Panke
+    @FileName: Unet.py
+    @Time: 2025/6/5 22:47
+    @Email: None
+"""
+
+import torch
+import torch.nn as nn
+
+
+class ConvBlock(nn.Module):
+    """Conv => BN => ReLU x2"""
+
+    def __init__(self, in_ch, out_ch):
+        super(ConvBlock, self).__init__()
+        self.double_conv = nn.Sequential(
+            nn.Conv2d(in_ch, out_ch, kernel_size=3, padding=1),
+            nn.BatchNorm2d(out_ch),
+            nn.ReLU(inplace=True),
+
+            nn.Conv2d(out_ch, out_ch, kernel_size=3, padding=1),
+            nn.BatchNorm2d(out_ch),
+            nn.ReLU(inplace=True),
+        )
+
+    def forward(self, x):
+        return self.double_conv(x)
+
+
+class UNetLKC(nn.Module):
+    def __init__(self, in_channels=3, out_channels=3, base_c=36):
+        super(UNetLKC, self).__init__()
+        self.model_name = 'UNetLKC'
+
+        # Down path
+        self.enc1 = ConvBlock(in_channels, base_c)
+        self.pool1 = nn.MaxPool2d(2)
+
+        self.enc2 = ConvBlock(base_c, base_c * 2)
+        self.pool2 = nn.MaxPool2d(2)
+
+        self.enc3 = ConvBlock(base_c * 2, base_c * 4)
+        self.pool3 = nn.MaxPool2d(2)
+
+        # Bottleneck
+        self.bottleneck = ConvBlock(base_c * 4, base_c * 4)
+
+        self.up3 = nn.ConvTranspose2d(base_c * 4, base_c * 4, kernel_size=3, stride=1, padding=1)
+        self.dec3 = ConvBlock(base_c * 8, base_c * 4)
+
+        self.up2 = nn.ConvTranspose2d(base_c * 4, base_c * 2, kernel_size=2, stride=2)
+        self.dec2 = ConvBlock(base_c * 4, base_c * 2)
+
+        self.up1 = nn.ConvTranspose2d(base_c * 2, base_c, kernel_size=2, stride=2)
+        self.dec1 = ConvBlock(base_c * 2, base_c)
+
+        # Output
+        self.out_conv = nn.Conv2d(base_c, out_channels, kernel_size=1)
+
+    def forward(self, x):
+        # Encoder
+        x1 = self.enc1(x)
+        x2 = self.enc2(self.pool1(x1))
+        x3 = self.enc3(self.pool2(x2))
+
+        # Bottleneck
+        x5 = self.bottleneck(x3)
+
+        x = self.up3(x5)
+        x = self.dec3(torch.cat([x, x5], dim=1))
+
+        x = self.up2(x)
+        x = self.dec2(torch.cat([x, x2], dim=1))
+
+        x = self.up1(x)
+        x = self.dec1(torch.cat([x, x1], dim=1))
+
+        out = self.out_conv(x)
+        out = torch.sigmoid(out)  # Normalize output to [0,1]
+        return out

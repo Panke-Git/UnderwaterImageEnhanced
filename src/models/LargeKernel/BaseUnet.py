@@ -339,29 +339,29 @@ class UIR_PolyKernel(nn.Module):
         self.norm = nn.Sigmoid()
 
     def forward(self, x):
-        inp = self.input_embed(x)
-        out_enc_level1 = self.encoder_level1(inp)
+        inp = self.input_embed(x)   # [36, 256, 256]
+        out_enc_level1 = self.encoder_level1(inp)   # [36, 256, 256]
 
-        inp_enc_level2 = self.down1_2(out_enc_level1)
-        out_enc_level2 = self.encoder_level2(inp_enc_level2)
+        inp_enc_level2 = self.down1_2(out_enc_level1)   # [72, 128, 128]
+        out_enc_level2 = self.encoder_level2(inp_enc_level2)    # [72, 128, 128]
 
-        inp_enc_level3 = self.down2_3(out_enc_level2)
-        out_enc_level3 = self.encoder_level3(inp_enc_level3)
+        inp_enc_level3 = self.down2_3(out_enc_level2)   # [144, 64, 64]
+        out_enc_level3 = self.encoder_level3(inp_enc_level3)    # [144, 64, 64]
 
-        latent = self.bottleneck(out_enc_level3)
+        latent = self.bottleneck(out_enc_level3)    # [144, 64, 64]
 
-        inp_dec_level3 = cat(latent, out_enc_level3)
-        inp_dec_level3 = self.reduce_chan_level3(inp_dec_level3)
-        out_dec_level3 = self.decoder_level3(inp_dec_level3)
+        inp_dec_level3 = cat(latent, out_enc_level3)    # [288, 64, 64]
+        inp_dec_level3 = self.reduce_chan_level3(inp_dec_level3)    # [144, 64, 64]
+        out_dec_level3 = self.decoder_level3(inp_dec_level3)    # [144, 64, 64]
 
-        inp_dec_level2 = self.up3_2(out_dec_level3)
-        inp_dec_level2 = cat(inp_dec_level2, out_enc_level2)
-        inp_dec_level2 = self.reduce_chan_level2(inp_dec_level2)
-        out_dec_level2 = self.decoder_level2(inp_dec_level2)
+        inp_dec_level2 = self.up3_2(out_dec_level3) # [72, 128, 128]
+        inp_dec_level2 = cat(inp_dec_level2, out_enc_level2)    # [144, 128, 128]
+        inp_dec_level2 = self.reduce_chan_level2(inp_dec_level2)    # [72, 128, 128]
+        out_dec_level2 = self.decoder_level2(inp_dec_level2)    # [72, 128, 128]
 
-        inp_dec_level1 = self.up2_1(out_dec_level2)
-        inp_dec_level1 = cat(inp_dec_level1, out_enc_level1)
-        inp_dec_level1 = self.reduce_chan_level1(inp_dec_level1)
-        out_dec_level1 = self.decoder_level1(inp_dec_level1)
+        inp_dec_level1 = self.up2_1(out_dec_level2) # [36, 256, 256]
+        inp_dec_level1 = cat(inp_dec_level1, out_enc_level1)    # [72, 256, 256]
+        inp_dec_level1 = self.reduce_chan_level1(inp_dec_level1)    # [36, 256, 256]
+        out_dec_level1 = self.decoder_level1(inp_dec_level1)    # [36, 256, 256]
 
         return self.norm(self.final_conv(out_dec_level1) + x)

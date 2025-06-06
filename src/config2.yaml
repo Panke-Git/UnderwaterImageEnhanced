@@ -6,7 +6,7 @@ PROJECT:
   TRAIN_DIR: /root/cyx/CL/PRO/MyPro/UnderwaterImageEnhanced/dataset/LSUIN/Train
   VAL_DIR: /root/cyx/CL/PRO/MyPro/UnderwaterImageEnhanced/dataset/LSUIN/Val
   SAVE_DIR: /root/cyx/CL/PRO/MyPro/UnderwaterImageEnhanced/save_dir
-  EXPT_RECORD_DIR: /root/cyx/CL/PRO/MyPro/UnderwaterImageEnhanced/expt_record
+  EXPT_RECORD_DIR: /root/cyx/CL/PRO/MyPro/UnderwaterImageEnhanced/expt_fx/LargeKernelCNN
   LOG_DIR: /root/cyx/CL/PRO/MyPro/UnderwaterImageEnhanced/log
   VISUAL_DATA: /root/cyx/CL/PRO/MyPro/UnderwaterImageEnhanced/dataset/visual_img
 
@@ -16,16 +16,16 @@ DATASET:
   TARGET: 'GT'
 
 TRAIN:
-  DEVICE: 'cuda:0'
+  DEVICE: 'cuda:7'
   VAL_AFTER_EVERY: 1
   RESUME: False
   WEIGHT: ''
   IMG_H: 256
   IMG_W: 256
   ORI: False
-  BATCH_SIZE: 64
+  BATCH_SIZE: 32
   LR: 2e-4
-  EPOCHS: 200
+  EPOCHS: 500
   PRINT_FREQ: 1
 
 

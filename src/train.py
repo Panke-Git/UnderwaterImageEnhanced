@@ -15,6 +15,7 @@ from tqdm import tqdm
 
 from src.data.dataset import DataReader
 from src import models
+from src.models import LargeKernel as lk
 from src.utils import record_utils
 from src.utils.config import Config
 from src.utils.enhance_train_visual import visual_enhance, train_visual
@@ -69,8 +70,8 @@ def train():
     # ========================================================================================
     # ==================================注意修改此值============================================
     # ========================================================================================
-    model = models.UNetHybridAttentionV3().to(device)
-    model_description = '使用自己设计的HybridAttention替换Unet的第一层，其中HybridAttention中使用了自己设计的BN搭配Conv;'
+    model = lk.UNetCSC_LKA().to(device)
+    model_description = '大核卷积Unet+LKA+CSC'
     expt_id = generate_experiment_id(model=model.model_name,
                                      dataset='LSUI',
                                      loss='SmoothL1Loss',
