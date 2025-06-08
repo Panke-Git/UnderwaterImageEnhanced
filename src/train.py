@@ -24,6 +24,7 @@ from src.utils.train_utils import seed_everything
 
 import warnings
 
+
 from tools.tribute_banner import show_banner
 
 warnings.filterwarnings("ignore", message="Error fetching version info")
@@ -72,8 +73,8 @@ def train():
     # ========================================================================================
     # ==================================注意修改此值============================================
     # ========================================================================================
-    model = lk.UNetCSC_LKA().to(device)
-    model_description = '大核卷积Unet+LKA+CSC'
+    model = models.UNetHybridAttentionV4().to(device)
+    model_description = '使用自己设计的HybridAttention替换Unet第一层的两头，其中HybridAttention中使用了自己设计的GN搭配Conv'
     expt_id = generate_experiment_id(model=model.model_name,
                                      dataset='LSUI',
                                      loss='SmoothL1Loss',

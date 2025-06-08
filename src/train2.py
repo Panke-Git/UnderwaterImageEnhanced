@@ -72,8 +72,8 @@ def train():
     # ========================================================================================
     # ==================================注意修改此值============================================
     # ========================================================================================
-    model = lk.UNetLKA().to(device)
-    model_description = '大核卷积Unet+LKA'
+    model = models.UIRPolyKernelSE().to(device)
+    model_description = '把大核卷积的网络UIRPolyKernel中的瓶颈层的csc换成了SENet'
     expt_id = generate_experiment_id(model=model.model_name,
                                      dataset='LSUI',
                                      loss='SmoothL1Loss',

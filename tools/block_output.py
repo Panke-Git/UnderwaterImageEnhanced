@@ -20,13 +20,13 @@ from src.models.block.MPNCOV import MPNCOV
 x = torch.randn(1, 3, 256, 256).to(torch.device('cuda:0'))
 
 # block = CSC_block(3)
-# unet = lk.UIR_PolyKernel().to(torch.device('cuda:0'))
+unet = models.UNetHybridAttentionV4().to(torch.device('cuda:0'))
 # unet = MPNCOV(input_dim=256, iterNum=5, dimension_reduction=256).to(torch.device('cuda:0'))
-net = lk.UNetCSC_LKA_SDCA_FDPA().to(torch.device('cuda:0'))
+# net = lk.UNetCSC_LKA_SDCA_FDPA().to(torch.device('cuda:0'))
 
 
 print(x.shape)
-out = net(x)
+out = unet(x)
 print(out.shape)
 
 
