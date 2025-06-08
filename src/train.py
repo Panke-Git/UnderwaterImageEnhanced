@@ -24,7 +24,6 @@ from src.utils.train_utils import seed_everything
 
 import warnings
 
-
 from tools.tribute_banner import show_banner
 
 warnings.filterwarnings("ignore", message="Error fetching version info")
@@ -63,7 +62,7 @@ def train():
                               batch_size=config.TRAIN.BATCH_SIZE,
                               shuffle=True,
                               num_workers=4,
-                              pin_memory=True,)
+                              pin_memory=True, )
     val_loader = DataLoader(val_dataset,
                             batch_size=config.TRAIN.BATCH_SIZE,
                             shuffle=False,
@@ -73,8 +72,8 @@ def train():
     # ========================================================================================
     # ==================================注意修改此值============================================
     # ========================================================================================
-    model = models.UNetHybridAttentionV4().to(device)
-    model_description = '使用自己设计的HybridAttention替换Unet第一层的两头，其中HybridAttention中使用了自己设计的GN搭配Conv'
+    model = models.UNetHybridAttentionV3().to(device)
+    model_description = '使用自己设计的HybridAttention替换Unet的第一层，其中HybridAttention中使用了自己设计的GN搭配Conv'
     expt_id = generate_experiment_id(model=model.model_name,
                                      dataset='LSUI',
                                      loss='SmoothL1Loss',
@@ -104,6 +103,9 @@ def train():
                                                       optimizer=str(optimizer_b),
                                                       dataset=train_dir,
                                                       )
+    record_utils.record_model_description(
+        os.path.join(config.PROJECT.ROOT_PATH, 'src', 'models', '01_ModelDescription.json'),
+        model_name=model.model_name, model_description=model_description)
     print("配置信息保存至: ", config_file_path, "下!")
 
     top_psnr = 0.0

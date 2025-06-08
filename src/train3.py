@@ -72,8 +72,8 @@ def train():
     # ========================================================================================
     # ==================================注意修改此值============================================
     # ========================================================================================
-    model = lk.UNetCSC_LKA_SDCA().to(device)
-    model_description = '大核卷积Unet+LKA+SDCA'
+    model = models.UNetHybridAttentionV6().to(device)
+    model_description = '基于UNetHybridAttentionV3，将HybridAttention的两个并行分支拆开，保留下半部分，即GroupNorm的部分；'
     expt_id = generate_experiment_id(model=model.model_name,
                                      dataset='LSUI',
                                      loss='SmoothL1Loss',
@@ -103,6 +103,9 @@ def train():
                                                       optimizer=str(optimizer_b),
                                                       dataset=train_dir,
                                                       )
+    record_utils.record_model_description(
+        os.path.join(config.PROJECT.ROOT_PATH, 'src', 'models', '01_ModelDescription.json'),
+        model_name=model.model_name, model_description=model_description)
     print("配置信息保存至: ", config_file_path, "下!")
 
     top_psnr = 0.0

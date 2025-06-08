@@ -30,7 +30,7 @@ warnings.filterwarnings("ignore", message="Error fetching version info")
 
 
 def train():
-    config = Config.load(r'./src/config/config4.yaml')
+    config = Config.load(r'../src/config/config4.yaml')
     # show_banner()
     # 开始时间
     start_time = datetime.now().strftime('%Y%m%d_%H%M%S')

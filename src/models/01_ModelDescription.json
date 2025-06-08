@@ -1,0 +1,16 @@
+{
+    "UNet": "基础Unet",
+    "UNet_CSC": "Unet 在瓶颈层之后加入了CSC_Block(UIR-PolyKernel这个论文中的一个模块)",
+    "UNet_CSC_V2": "Unet 在四层和第五层加入了CSC_Block, x4输出后经过一个csc, x5输出后经过一个csc;",
+    "UNet_CSC_V3": "Unet x4输出[512,16,16]后加csc block，再使用卷积卷到[1024,16,16]",
+    "UNet_CSC_V4": "Unet x1 输出通过CSC Block之后再进行跳跃连接",
+    "UNet_DWT_V1": "Unet x1输出之后经过基于小波变换的模块，模块详情：1.对特征图使用DWT；2.对LL使用自适应直方图；3.高频分量增强清晰度；",
+    "UNet_DWT_V2": "Unet x1输出之后经过基于小波变换的模块，模块详情：1.对特征图使用DWT；2.对LL使用自适应直方图；3.高频分量增强清晰度；并添加了残差，小波模块为x1_1, 整体输出为x1+x1_1",
+    "UNetHybridAttention": "Unet 使用自己写的HybridAttention,替换第一个enc1层",
+    "UNetHybridAttentionV2": "Unet 使用自己写的HybridAttention,替换第一个enc1层,将HybridAttention里边的LayerNorm换成了无偏置的LayerNorm",
+    "UNetHybridAttentionV3": "使用自己设计的HybridAttention替换Unet的第一层，其中HybridAttention中使用了自己设计的GN搭配Conv",
+    "UNetHybridAttentionV4": "使用自己设计的HybridAttention替换Unet第一层的两头，其中HybridAttention中使用了自己设计的GN搭配Conv",
+    "UIRPolyKernelSE": "把大核卷积的网络UIRPolyKernel中的瓶颈层的csc换成了SENet",
+    "UNetHybridAttentionV5": "基于UNetHybridAttentionV3，将HybridAttention的两个并行分支拆开，保留上半部分，即DWT的部分；",
+    "UNetHybridAttentionV6": "基于UNetHybridAttentionV3，将HybridAttention的两个并行分支拆开，保留下半部分，即GroupNorm的部分；"
+}

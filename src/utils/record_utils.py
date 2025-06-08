@@ -8,6 +8,7 @@
 
 import json
 import os
+import tempfile
 
 import pandas as pd
 
@@ -79,3 +80,22 @@ def save_train_config(save_path, **kwargs):
         f.write(json_data)
     f.close()
     return file_path
+
+def record_model_description(json_file, model_name, model_description):
+    # 读取原文件内容
+    with open(json_file, 'r', encoding='utf-8') as f:
+        data = json.load(f)
+
+    if model_name in data:
+        return  # 已存在则不做处理
+
+    data[model_name] = model_description
+
+    # 写入临时文件
+    dir_name = os.path.dirname(json_file)
+    with tempfile.NamedTemporaryFile('w', delete=False, dir=dir_name, encoding='utf-8') as tmp_file:
+        json.dump(data, tmp_file, indent=4, ensure_ascii=False)
+        temp_name = tmp_file.name
+
+    # 替换原文件
+    os.replace(temp_name, json_file)

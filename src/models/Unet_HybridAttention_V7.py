@@ -30,13 +30,10 @@ class ConvBlock(nn.Module):
         return self.double_conv(x)
 
 
-class UNetHybridAttentionV2(nn.Module):
-    """
-    Unet 使用自己写的HybridAttention,替换第一个enc1层,将HybridAttention里边的LayerNorm换成了无偏置的LayerNorm
-    """
+class UNetHybridAttentionV7(nn.Module):
     def __init__(self, in_channels=3, out_channels=3, base_c=64):
-        super(UNetHybridAttentionV2, self).__init__()
-        self.model_name = 'UNetHybridAttentionV2'
+        super(UNetHybridAttentionV7, self).__init__()
+        self.model_name = 'UNetHybridAttentionV7'
 
         self.conv1 = nn.Conv2d(in_channels, base_c, kernel_size=3, padding=1)
         self.bn1 = nn.BatchNorm2d(base_c)
@@ -69,7 +66,8 @@ class UNetHybridAttentionV2(nn.Module):
         self.dec2 = ConvBlock(base_c * 4, base_c * 2)
 
         self.up1 = nn.ConvTranspose2d(base_c * 2, base_c, kernel_size=2, stride=2)
-        self.dec1 = ConvBlock(base_c * 2, base_c)
+        self.hybrid_attention2 = HybridAttention(base_c)
+        # self.dec1 = ConvBlock(base_c * 2, base_c)
 
         # Output
         self.out_conv = nn.Conv2d(base_c, out_channels, kernel_size=1)
@@ -99,7 +97,8 @@ class UNetHybridAttentionV2(nn.Module):
         x = self.dec2(torch.cat([x, x2], dim=1))
 
         x = self.up1(x)
-        x = self.dec1(torch.cat([x, x1], dim=1))
+        x = self.hybrid_attention2(x)
+        # x = self.dec1(torch.cat([x, x1], dim=1))
 
         out = self.out_conv(x)
         out = torch.sigmoid(out)  # Normalize output to [0,1]
@@ -115,8 +114,8 @@ class HybridAttention(nn.Module):
         self.threshold = threshold if isinstance(threshold, float) else nn.Parameter(torch.tensor(threshold))
         self.alpha = nn.Parameter(torch.zeros(dim, 1, 1))
 
-        self.norm1 = LayerNorm(dim=dim, mode='biasfree')
-        self.norm2 = LayerNorm(dim=dim, mode='biasfree')
+        self.norm1 = GNConvBlock(in_ch=dim, out_ch=dim, num_groups=8)
+        self.norm2 = GNConvBlock(in_ch=dim, out_ch=dim, num_groups=8)
         self.avg_pool = nn.AdaptiveAvgPool2d((1, 1))
 
         self.dw_ffn = DW_FFN(dim)
@@ -207,3 +206,19 @@ class LayerNorm(nn.Module):
     def forward(self, x):
         H, W = x.shape[-2:]
         return to_4d(self.norm(to_3d(x)), H, W)
+
+
+class GNConvBlock(nn.Module):
+    def __init__(self, in_ch, out_ch, num_groups=8):
+        super(GNConvBlock, self).__init__()
+        self.block = nn.Sequential(
+            nn.Conv2d(in_ch, out_ch, kernel_size=3, padding=1),
+            nn.GroupNorm(num_groups=num_groups, num_channels=out_ch),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(out_ch, out_ch, kernel_size=3, padding=1),
+            nn.GroupNorm(num_groups=num_groups, num_channels=out_ch),
+            nn.ReLU(inplace=True),
+        )
+
+    def forward(self, x):
+        return self.block(x)

@@ -31,6 +31,9 @@ class ConvBlock(nn.Module):
 
 
 class UNetHybridAttentionV3(nn.Module):
+    """
+    使用自己设计的HybridAttention替换Unet的第一层，其中HybridAttention中使用了自己设计的GN搭配Conv
+    """
     def __init__(self, in_channels=3, out_channels=3, base_c=64):
         super(UNetHybridAttentionV3, self).__init__()
         self.model_name = 'UNetHybridAttentionV3'
@@ -130,9 +133,9 @@ class HybridAttention(nn.Module):
 
         x1 = self.avg_pool(self.norm1(x))
         x2 = x + x1
-        x3 = self.dw_ffn(self.dw_ffn(self.norm2(x2)))
+        x3 = self.dw_ffn(self.norm2(x2))
 
-        out = x3 + torch.abs(self.idwt((ll, Yh)))
+        out = x + x3 + torch.abs(self.idwt((ll, Yh)))
 
         return out
 
