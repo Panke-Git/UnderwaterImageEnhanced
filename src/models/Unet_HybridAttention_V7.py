@@ -31,19 +31,21 @@ class ConvBlock(nn.Module):
 
 
 class UNetHybridAttentionV7(nn.Module):
+    """
+    基于UNet，将自己写的HybridAttention的放到第二个跳跃连接的两头；其中HybridAttention中没有使用输入连接到最后；
+    """
     def __init__(self, in_channels=3, out_channels=3, base_c=64):
         super(UNetHybridAttentionV7, self).__init__()
         self.model_name = 'UNetHybridAttentionV7'
-
-        self.conv1 = nn.Conv2d(in_channels, base_c, kernel_size=3, padding=1)
-        self.bn1 = nn.BatchNorm2d(base_c)
-        self.hybrid_attention = HybridAttention(base_c)
 
         # Down path
         self.enc1 = ConvBlock(in_channels, base_c)
         self.pool1 = nn.MaxPool2d(2)
 
-        self.enc2 = ConvBlock(base_c, base_c * 2)
+        self.hybrid_attention1 = HybridAttention(base_c)
+        self.conv1 = nn.Conv2d(base_c, base_c * 2, kernel_size=3, padding=1)
+        self.bn1 = nn.BatchNorm2d(base_c * 2)
+        # self.enc2 = ConvBlock(base_c, base_c * 2)
         self.pool2 = nn.MaxPool2d(2)
 
         self.enc3 = ConvBlock(base_c * 2, base_c * 4)
@@ -63,23 +65,23 @@ class UNetHybridAttentionV7(nn.Module):
         self.dec3 = ConvBlock(base_c * 8, base_c * 4)
 
         self.up2 = nn.ConvTranspose2d(base_c * 4, base_c * 2, kernel_size=2, stride=2)
-        self.dec2 = ConvBlock(base_c * 4, base_c * 2)
+        # self.dec2 = ConvBlock(base_c * 4, base_c * 2)
+        self.hybrid_attention2 = HybridAttention(base_c * 2)
+        self.conv2 = nn.Conv2d(base_c * 4, base_c * 2, kernel_size=3, padding=1)
 
         self.up1 = nn.ConvTranspose2d(base_c * 2, base_c, kernel_size=2, stride=2)
-        self.hybrid_attention2 = HybridAttention(base_c)
-        # self.dec1 = ConvBlock(base_c * 2, base_c)
+        self.dec1 = ConvBlock(base_c * 2, base_c)
 
         # Output
         self.out_conv = nn.Conv2d(base_c, out_channels, kernel_size=1)
 
     def forward(self, x):
         # Encoder
-        x1 = self.conv1(x)
-        x1 = self.bn1(x1)
-        x1 = self.hybrid_attention(x1)
-
-        # x1 = self.enc1(x)
-        x2 = self.enc2(self.pool1(x1))
+        x1 = self.enc1(x)
+        x2 = self.hybrid_attention1(self.pool1(x1))
+        x2 = self.bn1(self.conv1(x2))
+        # print(x2.shape)
+        # x2 = self.enc2(self.pool1(x1))
         x3 = self.enc3(self.pool2(x2))
         x4 = self.enc4(self.pool3(x3))
 
@@ -94,11 +96,12 @@ class UNetHybridAttentionV7(nn.Module):
         x = self.dec3(torch.cat([x, x3], dim=1))
 
         x = self.up2(x)
-        x = self.dec2(torch.cat([x, x2], dim=1))
+        x = self.hybrid_attention2(x)
+        x = self.conv2(torch.cat([x, x2], dim=1))
+        # x = self.dec2(torch.cat([x, x2], dim=1))
 
         x = self.up1(x)
-        x = self.hybrid_attention2(x)
-        # x = self.dec1(torch.cat([x, x1], dim=1))
+        x = self.dec1(torch.cat([x, x1], dim=1))
 
         out = self.out_conv(x)
         out = torch.sigmoid(out)  # Normalize output to [0,1]
@@ -132,7 +135,7 @@ class HybridAttention(nn.Module):
 
         x1 = self.avg_pool(self.norm1(x))
         x2 = x + x1
-        x3 = self.dw_ffn(self.dw_ffn(self.norm2(x2)))
+        x3 = self.dw_ffn(self.norm2(x2))
 
         out = x3 + torch.abs(self.idwt((ll, Yh)))
 

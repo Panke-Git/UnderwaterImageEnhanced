@@ -12,5 +12,7 @@
     "UNetHybridAttentionV4": "使用自己设计的HybridAttention替换Unet第一层的两头，其中HybridAttention中使用了自己设计的GN搭配Conv",
     "UIRPolyKernelSE": "把大核卷积的网络UIRPolyKernel中的瓶颈层的csc换成了SENet",
     "UNetHybridAttentionV5": "基于UNetHybridAttentionV3，将HybridAttention的两个并行分支拆开，保留上半部分，即DWT的部分；",
-    "UNetHybridAttentionV6": "基于UNetHybridAttentionV3，将HybridAttention的两个并行分支拆开，保留下半部分，即GroupNorm的部分；"
+    "UNetHybridAttentionV6": "基于UNetHybridAttentionV3，将HybridAttention的两个并行分支拆开，保留下半部分，即GroupNorm的部分；",
+    "UNetHybridAttentionV8": "基于UNet，将自己写的HybridAttention的放到第三个跳跃连接的两头；其中HybridAttention中没有使用输入连接到最后；",
+    "UNetHybridAttentionV7": "基于UNet，将自己写的HybridAttention的放到第二个跳跃连接的两头；其中HybridAttention中没有使用输入连接到最后；"
 }

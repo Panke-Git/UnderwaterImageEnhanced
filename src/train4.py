@@ -30,7 +30,7 @@ warnings.filterwarnings("ignore", message="Error fetching version info")
 
 
 def train():
-    config = Config.load(r'../src/config/config4.yaml')
+    config = Config.load(r'./src/config/config4.yaml')
     # show_banner()
     # 开始时间
     start_time = datetime.now().strftime('%Y%m%d_%H%M%S')
@@ -72,8 +72,8 @@ def train():
     # ========================================================================================
     # ==================================注意修改此值============================================
     # ========================================================================================
-    model = lk.UNetCSC_LKA_SDCA_FDPA().to(device)
-    model_description = '大核卷积Unet+LKA+SDCA+FDPA'
+    model = models.UNetHybridAttentionV8().to(device)
+    model_description = '基于UNet，将自己写的HybridAttention的放到第三个跳跃连接的两头；其中HybridAttention中没有使用输入连接到最后；'
     expt_id = generate_experiment_id(model=model.model_name,
                                      dataset='LSUI',
                                      loss='SmoothL1Loss',
@@ -103,6 +103,9 @@ def train():
                                                       optimizer=str(optimizer_b),
                                                       dataset=train_dir,
                                                       )
+    record_utils.record_model_description(
+        os.path.join(config.PROJECT.ROOT_PATH, 'src', 'models', '01_ModelDescription.json'),
+        model_name=model.model_name, model_description=model_description)
     print("配置信息保存至: ", config_file_path, "下!")
 
     top_psnr = 0.0

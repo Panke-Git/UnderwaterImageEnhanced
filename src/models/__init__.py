@@ -31,9 +31,13 @@ __all__ = ['UNet',
            'UIRPolyKernelSE',
            'UNetHybridAttentionV4',
            'UNetHybridAttentionV5',
-           'UNetHybridAttentionV6', ]
+           'UNetHybridAttentionV6',
+           'UNetHybridAttentionV7',
+           'UNetHybridAttentionV8',]
 
 from .Unet_HybridAttention_V5 import UNetHybridAttentionV5
 
 from .Unet_HybridAttention_V6 import UNetHybridAttentionV6
+from .Unet_HybridAttention_V7 import UNetHybridAttentionV7
+from .Unet_HybridAttention_V8 import UNetHybridAttentionV8
 
