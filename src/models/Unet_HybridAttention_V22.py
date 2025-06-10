@@ -30,14 +30,13 @@ class ConvBlock(nn.Module):
         return self.double_conv(x)
 
 
-class UNetHybridAttentionV8(nn.Module):
+class UNetHybridAttentionV22(nn.Module):
     """
-    基于UNet，将自己写的HybridAttention的放到第三个跳跃连接的两头；其中HybridAttention中没有使用输入连接到最后；
+    基于UNetHybridAttentionV8，将HybridAttention的特征融合的部分改为可训练加权融合；没有残差连接；
     """
-
     def __init__(self, in_channels=3, out_channels=3, base_c=64):
-        super(UNetHybridAttentionV8, self).__init__()
-        self.model_name = 'UNetHybridAttentionV8'
+        super(UNetHybridAttentionV22, self).__init__()
+        self.model_name = 'UNetHybridAttentionV22'
 
         # Down path
         self.enc1 = ConvBlock(in_channels, base_c)
@@ -109,9 +108,8 @@ class UNetHybridAttentionV8(nn.Module):
 
 
 class HybridAttention(nn.Module):
-    def __init__(self, dim, threshold=0.05):
+    def __init__(self, dim, threshold=0.05, init_beta=0.5):
         super(HybridAttention, self).__init__()
-        self.conv = nn.Conv2d(dim, dim, kernel_size=1, padding=0, stride=1, groups=dim)
         self.dwt = DWTForward(J=1, mode='zero', wave='haar')
         self.idwt = DWTInverse(mode='zero', wave='haar')
         self.threshold = threshold if isinstance(threshold, float) else nn.Parameter(torch.tensor(threshold))
@@ -122,22 +120,27 @@ class HybridAttention(nn.Module):
         self.avg_pool = nn.AdaptiveAvgPool2d((1, 1))
         self.dw_ffn = DW_FFN(dim)
 
+        self.beta = nn.Parameter(torch.tensor(init_beta))
+
     def soft_threshold(self, x, thresh):
         return torch.sign(x) * torch.clamp(torch.abs(x) - thresh, min=0.0)
 
     def forward(self, x):
+        # 上边的分支，DWT部分
         Yl, Yh = self.dwt(x)
         ll = Yl * self.alpha
-
         for j in range(len(Yh)):
             Yh[j] = self.soft_threshold(Yh[j], self.threshold)
         D_x = torch.abs(self.idwt((ll, Yh)))
 
+        # 下边的BN+DW_FFN部分
         N_x = self.avg_pool(self.norm1(x))
         N_x = x + N_x
         N_x = self.dw_ffn(self.norm2(N_x))
 
-        out = N_x + D_x
+        # 加权融合
+        beta = torch.clamp(self.beta, min=0.0, max=1.0)
+        out = beta * D_x + (1 - beta) * N_x
 
         return out
 

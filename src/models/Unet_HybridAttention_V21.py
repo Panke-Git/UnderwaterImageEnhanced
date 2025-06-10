@@ -30,14 +30,14 @@ class ConvBlock(nn.Module):
         return self.double_conv(x)
 
 
-class UNetHybridAttentionV8(nn.Module):
+class UNetHybridAttentionV20(nn.Module):
     """
-    基于UNet，将自己写的HybridAttention的放到第三个跳跃连接的两头；其中HybridAttention中没有使用输入连接到最后；
+    基于UNetHybridAttentionV8，将双流拆分，保留上半部分的DWT的部分；其中没有残差；
     """
 
     def __init__(self, in_channels=3, out_channels=3, base_c=64):
-        super(UNetHybridAttentionV8, self).__init__()
-        self.model_name = 'UNetHybridAttentionV8'
+        super(UNetHybridAttentionV20, self).__init__()
+        self.model_name = 'UNetHybridAttentionV20'
 
         # Down path
         self.enc1 = ConvBlock(in_channels, base_c)
@@ -120,6 +120,7 @@ class HybridAttention(nn.Module):
         self.norm1 = GNConvBlock(in_ch=dim, out_ch=dim, num_groups=8)
         self.norm2 = GNConvBlock(in_ch=dim, out_ch=dim, num_groups=8)
         self.avg_pool = nn.AdaptiveAvgPool2d((1, 1))
+
         self.dw_ffn = DW_FFN(dim)
 
     def soft_threshold(self, x, thresh):
@@ -131,13 +132,12 @@ class HybridAttention(nn.Module):
 
         for j in range(len(Yh)):
             Yh[j] = self.soft_threshold(Yh[j], self.threshold)
-        D_x = torch.abs(self.idwt((ll, Yh)))
 
-        N_x = self.avg_pool(self.norm1(x))
-        N_x = x + N_x
-        N_x = self.dw_ffn(self.norm2(N_x))
+        x1 = self.avg_pool(self.norm1(x))
+        x2 = x + x1
+        x3 = self.dw_ffn(self.norm2(x2))
 
-        out = N_x + D_x
+        out = x3 + torch.abs(self.idwt((ll, Yh)))
 
         return out
 
