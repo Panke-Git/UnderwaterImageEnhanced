@@ -5,7 +5,6 @@
     @Time: 2025/6/2 01:29
     @Email: None
 """
-
 import torch
 import torch.nn as nn
 from pytorch_wavelets import DWTForward, DWTInverse
@@ -30,14 +29,13 @@ class ConvBlock(nn.Module):
         return self.double_conv(x)
 
 
-class UNetHybridAttentionV20(nn.Module):
+class UNetHybridAttentionV21(nn.Module):
     """
-    基于UNetHybridAttentionV8，将双流拆分，保留上半部分的DWT的部分；其中没有残差；
+    基于UNetHybridAttentionV8(第三层)，将HybridAttention的两个并行分支拆开，保留下半部分，即GroupNorm的部分；
     """
-
     def __init__(self, in_channels=3, out_channels=3, base_c=64):
-        super(UNetHybridAttentionV20, self).__init__()
-        self.model_name = 'UNetHybridAttentionV20'
+        super(UNetHybridAttentionV21, self).__init__()
+        self.model_name = 'UNetHybridAttentionV21'
 
         # Down path
         self.enc1 = ConvBlock(in_channels, base_c)
@@ -109,37 +107,37 @@ class UNetHybridAttentionV20(nn.Module):
 
 
 class HybridAttention(nn.Module):
-    def __init__(self, dim, threshold=0.05):
+    def __init__(self, dim, threshold=0.05, init_beta=0.5):
         super(HybridAttention, self).__init__()
-        self.conv = nn.Conv2d(dim, dim, kernel_size=1, padding=0, stride=1, groups=dim)
-        self.dwt = DWTForward(J=1, mode='zero', wave='haar')
-        self.idwt = DWTInverse(mode='zero', wave='haar')
-        self.threshold = threshold if isinstance(threshold, float) else nn.Parameter(torch.tensor(threshold))
-        self.alpha = nn.Parameter(torch.zeros(dim, 1, 1))
+        # self.dwt = DWTForward(J=1, mode='zero', wave='haar')
+        # self.idwt = DWTInverse(mode='zero', wave='haar')
+        # self.threshold = threshold if isinstance(threshold, float) else nn.Parameter(torch.tensor(threshold))
+        # self.alpha = nn.Parameter(torch.zeros(dim, 1, 1))
 
         self.norm1 = GNConvBlock(in_ch=dim, out_ch=dim, num_groups=8)
         self.norm2 = GNConvBlock(in_ch=dim, out_ch=dim, num_groups=8)
         self.avg_pool = nn.AdaptiveAvgPool2d((1, 1))
-
         self.dw_ffn = DW_FFN(dim)
+
+        self.beta = nn.Parameter(torch.tensor(init_beta))
 
     def soft_threshold(self, x, thresh):
         return torch.sign(x) * torch.clamp(torch.abs(x) - thresh, min=0.0)
 
     def forward(self, x):
-        Yl, Yh = self.dwt(x)
-        ll = Yl * self.alpha
+        # 上边的分支，DWT部分
+        # Yl, Yh = self.dwt(x)
+        # ll = Yl * self.alpha
+        # for j in range(len(Yh)):
+        #     Yh[j] = self.soft_threshold(Yh[j], self.threshold)
+        # D_x = torch.abs(self.idwt((ll, Yh)))
 
-        for j in range(len(Yh)):
-            Yh[j] = self.soft_threshold(Yh[j], self.threshold)
+        # 下边的BN+DW_FFN部分
+        N_x = self.avg_pool(self.norm1(x))
+        N_x = x + N_x
+        N_x = self.dw_ffn(self.norm2(N_x))
 
-        x1 = self.avg_pool(self.norm1(x))
-        x2 = x + x1
-        x3 = self.dw_ffn(self.norm2(x2))
-
-        out = x3 + torch.abs(self.idwt((ll, Yh)))
-
-        return out
+        return N_x
 
 
 class DW_FFN(nn.Module):

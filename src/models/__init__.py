@@ -15,6 +15,7 @@ from .Unet_CSC_V4 import UNet_CSC_V4
 from .Unet_DWT_V2 import UNet_DWT_V2
 from .Unet_HybridAttention import UNetHybridAttention
 from .Unet_HybridAttention_V2 import UNetHybridAttentionV2
+from .Unet_HybridAttention_V21 import UNetHybridAttentionV21
 from .Unet_HybridAttention_V22 import UNetHybridAttentionV22
 from .Unet_HybridAttention_V23 import UNetHybridAttentionV23
 from .Unet_HybridAttention_V3 import UNetHybridAttentionV3
@@ -23,6 +24,8 @@ from .Unet_HybridAttention_V5 import UNetHybridAttentionV5
 from .Unet_HybridAttention_V6 import UNetHybridAttentionV6
 from .Unet_HybridAttention_V7 import UNetHybridAttentionV7
 from .Unet_HybridAttention_V8 import UNetHybridAttentionV8
+from .Unet_HybridAttention_V9 import UNetHybridAttentionV9
+from .Unet_HybridAttention_V20 import UNetHybridAttentionV20
 
 __all__ = ['UNet',
            'Unet_CSC',
@@ -40,5 +43,9 @@ __all__ = ['UNet',
            'UNetHybridAttentionV6',
            'UNetHybridAttentionV7',
            'UNetHybridAttentionV8',
+           'UNetHybridAttentionV9',
+           'UNetHybridAttentionV20',
+           'UNetHybridAttentionV21',
            'UNetHybridAttentionV22',
            'UNetHybridAttentionV23']
+

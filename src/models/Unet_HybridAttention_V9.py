@@ -5,6 +5,7 @@
     @Time: 2025/6/2 01:29
     @Email: None
 """
+
 import torch
 import torch.nn as nn
 from pytorch_wavelets import DWTForward, DWTInverse
@@ -29,14 +30,14 @@ class ConvBlock(nn.Module):
         return self.double_conv(x)
 
 
-class UNetHybridAttentionV20(nn.Module):
+class UNetHybridAttentionV9(nn.Module):
     """
-    基于UNetHybridAttentionV8(第三层)，将HybridAttention的两个并行分支拆开，保留上半部分，即DWT的部分；
+    基于UNet，将自己写的HybridAttention的放到第四个跳跃连接的两头；其中HybridAttention中没有使用输入连接到最后；
     """
 
     def __init__(self, in_channels=3, out_channels=3, base_c=64):
-        super(UNetHybridAttentionV20, self).__init__()
-        self.model_name = 'UNetHybridAttentionV20'
+        super(UNetHybridAttentionV9, self).__init__()
+        self.model_name = 'UNetHybridAttentionV9'
 
         # Down path
         self.enc1 = ConvBlock(in_channels, base_c)
@@ -45,13 +46,13 @@ class UNetHybridAttentionV20(nn.Module):
         self.enc2 = ConvBlock(base_c, base_c * 2)
         self.pool2 = nn.MaxPool2d(2)
 
-        # self.enc3 = ConvBlock(base_c * 2, base_c * 4)
-        self.hybrid_attention1 = HybridAttention(base_c * 2)
-        self.conv1 = nn.Conv2d(base_c * 2, base_c * 4, kernel_size=3, padding=1)
-        self.bn1 = nn.BatchNorm2d(base_c * 4)
+        self.enc3 = ConvBlock(base_c * 2, base_c * 4)
         self.pool3 = nn.MaxPool2d(2)
 
-        self.enc4 = ConvBlock(base_c * 4, base_c * 8)
+        # self.enc4 = ConvBlock(base_c * 4, base_c * 8)
+        self.hybrid_attention1 = HybridAttention(base_c * 4)
+        self.conv1 = nn.Conv2d(base_c * 4, base_c * 8, kernel_size=3, padding=1)
+        self.bn1 = nn.BatchNorm2d(base_c * 8)
         self.pool4 = nn.MaxPool2d(2)
 
         # Bottleneck
@@ -59,12 +60,12 @@ class UNetHybridAttentionV20(nn.Module):
 
         # Up path
         self.up4 = nn.ConvTranspose2d(base_c * 16, base_c * 8, kernel_size=2, stride=2)
-        self.dec4 = ConvBlock(base_c * 16, base_c * 8)
+        self.hybrid_attention2 = HybridAttention(base_c * 8)
+        self.conv2 = nn.Conv2d(base_c * 16, base_c * 8, kernel_size=3, padding=1)
+        # self.dec4 = ConvBlock(base_c * 16, base_c * 8)
 
         self.up3 = nn.ConvTranspose2d(base_c * 8, base_c * 4, kernel_size=2, stride=2)
-        self.hybrid_attention2 = HybridAttention(base_c * 4)
-        self.conv2 = nn.Conv2d(base_c * 8, base_c * 4, kernel_size=3, padding=1)
-        # self.dec3 = ConvBlock(base_c * 8, base_c * 4)
+        self.dec3 = ConvBlock(base_c * 8, base_c * 4)
 
         self.up2 = nn.ConvTranspose2d(base_c * 4, base_c * 2, kernel_size=2, stride=2)
         self.dec2 = ConvBlock(base_c * 4, base_c * 2)
@@ -79,22 +80,22 @@ class UNetHybridAttentionV20(nn.Module):
         # Encoder
         x1 = self.enc1(x)
         x2 = self.enc2(self.pool1(x1))
-        x3 = self.hybrid_attention1(self.pool2(x2))
-        x3 = self.bn1(self.conv1(x3))
-        # x3 = self.enc3(self.pool2(x2))
-        x4 = self.enc4(self.pool3(x3))
+        x3 = self.enc3(self.pool2(x2))
+
+        x4 = self.hybrid_attention1(self.pool3(x3))
+        x4 = self.bn1(self.conv1(x4))
 
         # Bottleneck
         x5 = self.bottleneck(self.pool4(x4))
 
         # Decoder
         x = self.up4(x5)
-        x = self.dec4(torch.cat([x, x4], dim=1))
+        x = self.hybrid_attention2(x)
+        x = self.conv2(torch.cat([x, x4], dim=1))
+        # x = self.dec4(torch.cat([x, x4], dim=1))
 
         x = self.up3(x)
-        x = self.hybrid_attention2(x)
-        x = self.conv2(torch.cat([x, x3], dim=1))
-        # x = self.dec3(torch.cat([x, x3], dim=1))
+        x = self.dec3(torch.cat([x, x3], dim=1))
 
         x = self.up2(x)
         x = self.dec2(torch.cat([x, x2], dim=1))
@@ -108,35 +109,36 @@ class UNetHybridAttentionV20(nn.Module):
 
 
 class HybridAttention(nn.Module):
-    def __init__(self, dim, threshold=0.05, init_beta=0.5):
+    def __init__(self, dim, threshold=0.05):
         super(HybridAttention, self).__init__()
+        self.conv = nn.Conv2d(dim, dim, kernel_size=1, padding=0, stride=1, groups=dim)
         self.dwt = DWTForward(J=1, mode='zero', wave='haar')
         self.idwt = DWTInverse(mode='zero', wave='haar')
         self.threshold = threshold if isinstance(threshold, float) else nn.Parameter(torch.tensor(threshold))
         self.alpha = nn.Parameter(torch.zeros(dim, 1, 1))
 
-        # self.norm1 = GNConvBlock(in_ch=dim, out_ch=dim, num_groups=8)
-        # self.norm2 = GNConvBlock(in_ch=dim, out_ch=dim, num_groups=8)
-        # self.avg_pool = nn.AdaptiveAvgPool2d((1, 1))
-        # self.dw_ffn = DW_FFN(dim)
-
+        self.norm1 = GNConvBlock(in_ch=dim, out_ch=dim, num_groups=8)
+        self.norm2 = GNConvBlock(in_ch=dim, out_ch=dim, num_groups=8)
+        self.avg_pool = nn.AdaptiveAvgPool2d((1, 1))
+        self.dw_ffn = DW_FFN(dim)
 
     def soft_threshold(self, x, thresh):
         return torch.sign(x) * torch.clamp(torch.abs(x) - thresh, min=0.0)
 
     def forward(self, x):
-        # 上边的分支，DWT部分
         Yl, Yh = self.dwt(x)
         ll = Yl * self.alpha
+
         for j in range(len(Yh)):
             Yh[j] = self.soft_threshold(Yh[j], self.threshold)
         D_x = torch.abs(self.idwt((ll, Yh)))
 
-        # # 下边的BN+DW_FFN部分
-        # N_x = self.avg_pool(self.norm1(x))
-        # N_x = x + N_x
-        # N_x = self.dw_ffn(self.norm2(N_x))
-        out = D_x
+
+        N_x = self.avg_pool(self.norm1(x))
+        N_x = x + N_x
+        N_x = self.dw_ffn(self.norm2(N_x))
+
+        out = N_x + D_x
         return out
 
 

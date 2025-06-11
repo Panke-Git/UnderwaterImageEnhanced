@@ -72,8 +72,8 @@ def train():
     # ========================================================================================
     # ==================================注意修改此值============================================
     # ========================================================================================
-    model = models.UNetHybridAttentionV22().to(device)
-    model_description = '基于UNetHybridAttentionV8，将HybridAttention的特征融合的部分改为可训练加权融合；没有残差连接；'
+    model = models.UNetHybridAttentionV20().to(device)
+    model_description = '基于UNetHybridAttentionV8(第三层)，将HybridAttention的两个并行分支拆开，保留上半部分，即DWT的部分；'
     expt_id = generate_experiment_id(model=model.model_name,
                                      dataset='LSUI',
                                      loss='SmoothL1Loss',
