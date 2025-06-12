@@ -72,8 +72,8 @@ def train():
     # ========================================================================================
     # ==================================注意修改此值============================================
     # ========================================================================================
-    model = models.UNetHybridAttentionV20().to(device)
-    model_description = '基于UNetHybridAttentionV8(第三层)，将HybridAttention的两个并行分支拆开，保留上半部分，即DWT的部分；'
+    model = models.UNetHybridAttentionV23_1().to(device)
+    model_description = '基于UNetHybridAttentionV23, 去掉alpha;'
     expt_id = generate_experiment_id(model=model.model_name,
                                      dataset='LSUI',
                                      loss='SmoothL1Loss',

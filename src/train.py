@@ -72,8 +72,8 @@ def train():
     # ========================================================================================
     # ==================================注意修改此值============================================
     # ========================================================================================
-    model = models.UNetHybridAttentionV9().to(device)
-    model_description = '基于UNet，将自己写的HybridAttention的放到第四个跳跃连接的两头；其中HybridAttention中没有使用输入连接到最后；'
+    model = models.UNetHybridAttentionV23().to(device)
+    model_description = '基于UNetHybridAttentionV8，将HybridAttention的特征融合的部分改为门控融合；没有残差连接；'
     expt_id = generate_experiment_id(model=model.model_name,
                                      dataset='LSUI',
                                      loss='SmoothL1Loss',
@@ -140,7 +140,6 @@ def train():
             val_loss = 0.0
             psnr_total = ssim_total = 0.0
             size = len(val_loader)
-            metrics = None
             with torch.no_grad():
                 for data in tqdm(val_loader):
                     inp, target = data[0].to(device), data[1].to(device)
@@ -150,6 +149,8 @@ def train():
                     psnr_total += psnr
                     ssim = structural_similarity_index_measure(res, target, data_range=1).item()
                     ssim_total += ssim
+                    alpha1 = model.hybrid_attention1.alpha.detach().cpu().squeeze().tolist()
+                    alpha2 = model.hybrid_attention2.alpha.detach().cpu().squeeze().tolist()
 
             psnr = psnr_total / size
             ssim = ssim_total / size
@@ -163,7 +164,9 @@ def train():
                                                           val_loss=float(val_loss),
                                                           val_psnr=float(psnr),
                                                           val_ssim=float(ssim),
-                                                          lr=float(optimizer_b.param_groups[0]["lr"]))
+                                                          lr=float(optimizer_b.param_groups[0]["lr"]),
+                                                          alpha1=alpha1,
+                                                          alpha2=alpha2)
             total_record.append(epoch_record)
 
             logger.log_metrics({'loss': val_loss}, epoch, 'val')
