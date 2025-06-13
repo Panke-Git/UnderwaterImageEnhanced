@@ -19,5 +19,7 @@
     "UNetHybridAttentionV23": "基于UNetHybridAttentionV8，将HybridAttention的特征融合的部分改为门控融合；没有残差连接；",
     "UNetHybridAttentionV21": "基于UNetHybridAttentionV8(第三层)，将HybridAttention的两个并行分支拆开，保留下半部分，即GroupNorm的部分；",
     "UNetHybridAttentionV9": "基于UNet，将自己写的HybridAttention的放到第四个跳跃连接的两头；其中HybridAttention中没有使用输入连接到最后；",
-    "UNetHybridAttentionV20": "基于UNetHybridAttentionV8(第三层)，将HybridAttention的两个并行分支拆开，保留上半部分，即DWT的部分；"
+    "UNetHybridAttentionV20": "基于UNetHybridAttentionV8(第三层)，将HybridAttention的两个并行分支拆开，保留上半部分，即DWT的部分；",
+    "UNetHybridAttention2V10": "使用HybridAttention2, 优化低频的部分，插入到Unet的第三层；",
+    "UNetHybridAttention2V11": "使用HybridAttention2, 优化高频的部分，插入到Unet的第三层；"
 }
