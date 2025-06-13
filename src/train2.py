@@ -72,8 +72,8 @@ def train():
     # ========================================================================================
     # ==================================注意修改此值============================================
     # ========================================================================================
-    model = models.UNetHybridAttentionV23_1().to(device)
-    model_description = '基于UNetHybridAttentionV23, 去掉alpha;'
+    model = models.UNetHybridAttention2V11().to(device)
+    model_description = '使用HybridAttention2, 优化高频的部分，插入到Unet的第三层；'
     expt_id = generate_experiment_id(model=model.model_name,
                                      dataset='LSUI',
                                      loss='SmoothL1Loss',
