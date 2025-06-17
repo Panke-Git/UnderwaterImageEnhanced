@@ -72,8 +72,8 @@ def train():
     # ========================================================================================
     # ==================================注意修改此值============================================
     # ========================================================================================
-    model = models.UNetHybridAttentionV24().to(device)
-    model_description = '基于UNetHybridAttentionV23，在高频的threshold后边添加了可学习的beta'
+    model = models.UNetHybridAttentionV25().to(device)
+    model_description = '基于UNetHybridAttentionV23，软阈值改为可训练的高频去噪模块'
     expt_id = generate_experiment_id(model=model.model_name,
                                      dataset='LSUI',
                                      loss='SmoothL1Loss',

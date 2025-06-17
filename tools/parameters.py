@@ -11,12 +11,8 @@ import torch
 from src import models
 from fvcore.nn import FlopCountAnalysis
 
-model = models.UNetHybridAttentionV23().to('cuda:0')
+model = models.UNetHybridAttentionV25().to('cuda:0')
 summary(model, input_size=(1, 3, 256, 256), depth=3)
-#
-# inputs = (torch.randn(1, 3, 256, 256).to('cuda:0'),)
-# flops = FlopCountAnalysis(model, inputs)
-# print(flops.total())
 
 
 

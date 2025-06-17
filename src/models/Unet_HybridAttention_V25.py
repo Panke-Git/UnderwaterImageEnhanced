@@ -30,14 +30,14 @@ class ConvBlock(nn.Module):
         return self.double_conv(x)
 
 
-class UNetHybridAttentionV23(nn.Module):
+class UNetHybridAttentionV25(nn.Module):
     """
-    基于UNetHybridAttentionV8，将HybridAttention的特征融合的部分改为门控融合；没有残差连接；
+    基于UNetHybridAttentionV23，软阈值改为可训练的高频去噪模块
     """
 
     def __init__(self, in_channels=3, out_channels=3, base_c=64):
-        super(UNetHybridAttentionV23, self).__init__()
-        self.model_name = 'UNetHybridAttentionV23'
+        super(UNetHybridAttentionV25, self).__init__()
+        self.model_name = 'UNetHybridAttentionV25'
 
         # Down path
         # Layer1
@@ -116,7 +116,8 @@ class HybridAttention(nn.Module):
         super(HybridAttention, self).__init__()
         self.dwt = DWTForward(J=1, mode='zero', wave='haar')
         self.idwt = DWTInverse(mode='zero', wave='haar')
-        self.threshold = threshold if isinstance(threshold, float) else nn.Parameter(torch.tensor(threshold))
+        # self.threshold = threshold if isinstance(threshold, float) else nn.Parameter(torch.tensor(threshold))
+        self.hf_denoiser=MultiDirHF_Denoiser(dim)
         self.alpha = nn.Parameter(torch.zeros(dim, 1, 1))
 
         self.norm1 = GNConvBlock(in_ch=dim, out_ch=dim, num_groups=8)
@@ -136,8 +137,9 @@ class HybridAttention(nn.Module):
         # 上边的分支，DWT部分
         Yl, Yh = self.dwt(x)
         ll = Yl * self.alpha
-        for j in range(len(Yh)):
-            Yh[j] = self.soft_threshold(Yh[j], self.threshold)
+        Yh = self.hf_denoiser(Yh)
+        # for j in range(len(Yh)):
+        #     Yh[j] = self.soft_threshold(Yh[j], self.threshold)
         D_x = torch.abs(self.idwt((ll, Yh)))
 
         # 下边的BN+DW_FFN部分
@@ -182,3 +184,39 @@ class GNConvBlock(nn.Module):
 
     def forward(self, x):
         return self.block(x)
+
+
+class HF_DenoiseBlock(nn.Module):
+    def __init__(self, channel):
+        super(HF_DenoiseBlock, self).__init__()
+        self.denoise = nn.Sequential(
+            nn.Conv2d(channel, channel, kernel_size=3, padding=1, bias=False),
+            nn.GroupNorm(8, channel),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(channel, channel, kernel_size=3, padding=1, bias=False),
+        )
+
+    def forward(self, x):
+        return self.denoise(x)
+
+
+class MultiDirHF_Denoiser(nn.Module):
+    def __init__(self, channel):
+        super(MultiDirHF_Denoiser, self).__init__()
+        self.lh_block = HF_DenoiseBlock(channel)
+        self.hl_block = HF_DenoiseBlock(channel)
+        self.hh_block = HF_DenoiseBlock(channel)
+
+    def forward(self, x):
+        Yh0 = x[0]
+
+        lh = Yh0[:, :, 0, :, :]
+        hl = Yh0[:, :, 1, :, :]
+        hh = Yh0[:, :, 2, :, :]
+
+        lh = self.lh_block(lh)
+        hl = self.hl_block(hl)
+        hh = self.hh_block(hh)
+
+        Yh_denoised = torch.stack([lh, hl, hh], dim=2)
+        return [Yh_denoised]
