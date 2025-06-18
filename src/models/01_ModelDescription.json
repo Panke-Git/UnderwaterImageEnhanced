@@ -22,5 +22,6 @@
     "UNetHybridAttentionV20": "基于UNetHybridAttentionV8(第三层)，将HybridAttention的两个并行分支拆开，保留上半部分，即DWT的部分；",
     "UNetHybridAttention2V10": "使用HybridAttention2, 优化低频的部分，插入到Unet的第三层；",
     "UNetHybridAttention2V11": "使用HybridAttention2, 优化高频的部分，插入到Unet的第三层；",
-    "UNetHybridAttentionV24": "基于UNetHybridAttentionV23，在高频的threshold后边添加了可学习的beta"
+    "UNetHybridAttentionV24": "基于UNetHybridAttentionV23，在高频的threshold后边添加了可学习的beta",
+    "UNetHybridAttentionV25": "基于UNetHybridAttentionV23，软阈值改为可训练的高频去噪模块"
 }
