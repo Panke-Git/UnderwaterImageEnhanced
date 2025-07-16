@@ -5,7 +5,7 @@
     @Time: 2025/5/20 00:09
     @Email: None
 """
-from .UIR_PolyKernel_SE import UIRPolyKernelSE
+# from .UIR_PolyKernel_SE import UIRPolyKernelSE
 from .Unet import UNet
 from .Unet_CSC import UNet_CSC
 from .Unet_DWT_V1 import UNet_DWT_V1
@@ -21,6 +21,7 @@ from .Unet_HybridAttention_V21 import UNetHybridAttentionV21
 from .Unet_HybridAttention_V22 import UNetHybridAttentionV22
 from .Unet_HybridAttention_V23 import UNetHybridAttentionV23
 from .Unet_HybridAttention_V23_1 import UNetHybridAttentionV23_1
+from .Unet_HybridAttention_V23_Ablation1 import UnetHybridAttentionV23Ablation1
 from .Unet_HybridAttention_V23_G import UNetHybridAttentionV23G
 from .Unet_HybridAttention_V24 import UNetHybridAttentionV24
 from .Unet_HybridAttention_V25 import UNetHybridAttentionV25
@@ -45,7 +46,7 @@ __all__ = ['UNet',
            'UNetHybridAttention',
            'UNetHybridAttentionV2',
            'UNetHybridAttentionV3',
-           'UIRPolyKernelSE',
+           # 'UIRPolyKernelSE',
            'UNetHybridAttentionV4',
            'UNetHybridAttentionV5',
            'UNetHybridAttentionV6',
@@ -62,5 +63,6 @@ __all__ = ['UNet',
            'UNetHybridAttentionV24',
            'UNetHybridAttentionV25',
            'UNetHybridAttentionV26',
-           'UNetHybridAttentionV23G']
+           'UNetHybridAttentionV23G',
+           'UnetHybridAttentionV23Ablation1']
 

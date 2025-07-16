@@ -72,10 +72,10 @@ def train():
     # ========================================================================================
     # ==================================注意修改此值============================================
     # ========================================================================================
-    model = models.UNetHybridAttentionV23().to(device)
-    model_description = '基于UNetHybridAttentionV23,调整软阈值为可学习'
-    # model_name = 'UNetHybridAttentionV23_2'
+    model = models.UnetHybridAttentionV23Ablation1().to(device)
+    model_description = '基于UNetHybridAttentionV8，输出每个高频子带的软阈值的稀疏性'
     model_name = model.model_name
+    # model_name = 'UNetHybridAttentionV23_2'
     expt_id = generate_experiment_id(model=model_name,
                                      dataset='LSUI',
                                      loss='SmoothL1Loss',
@@ -142,6 +142,8 @@ def train():
             train_loss = loss_psnr + loss_ssim * 0.2
             train_loss.backward()
             optimizer_b.step()
+        model.hybrid_attention1.log_epoch_stats(epoch, os.path.join(record_path, 'att1_log.txt'))
+        model.hybrid_attention2.log_epoch_stats(epoch, os.path.join(record_path, 'att2_log.txt'))
         scheduler_b.step()
         logger.writer.add_scalar('train/loss', train_loss.item(), epoch)
 
