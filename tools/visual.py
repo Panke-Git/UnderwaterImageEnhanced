@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 import torch
 from torch.utils.data import DataLoader
 
+from src import models
 from src.data.dataset import DataReader
 from src.models.Unet import UNet
 from src.models.Unet_CSC import UNet_CSC
@@ -39,7 +40,7 @@ def visual_enhance(root_dir='', img='', model_name='', ):
     inputs_list = []
     target_list = []
     output_list = []
-    model = UNet()
+    model = models.UNetHybridAttentionV23()
     pth_path = os.path.join(root_dir, 'best_result', 'TOP_PSNR.pth')
     pth_load = torch.load(pth_path, map_location='cpu', weights_only=True)
     model.load_state_dict(pth_load)
@@ -127,7 +128,7 @@ def train_visual(root_dir=''):
 
 
 if __name__ == '__main__':
-    root_path = r'E:\PythonProject\01_Personal\UnderwaterImageEnhanced\expt_record\UNet\20250522_223342'
-    img_path = r'E:\PythonProject\01_Personal\UnderwaterImageEnhanced\dataset\visual_img'
-    visual_enhance(root_path, img_path, model_name='UNet')
+    root_path = r'E:\PythonProject\01_Personal\UnderwaterImageEnhanced\expt_record\UNetHybridAttentionV23\20250610_000143'
+    img_path = r'C:\Users\Panke\Desktop\UIR_IMG'
+    visual_enhance(root_path, img_path, model_name='UNetHybridAttentionV23')
     train_visual(root_path)

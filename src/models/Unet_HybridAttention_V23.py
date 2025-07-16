@@ -116,7 +116,8 @@ class HybridAttention(nn.Module):
         super(HybridAttention, self).__init__()
         self.dwt = DWTForward(J=1, mode='zero', wave='haar')
         self.idwt = DWTInverse(mode='zero', wave='haar')
-        self.threshold = threshold if isinstance(threshold, float) else nn.Parameter(torch.tensor(threshold))
+        # self.threshold = threshold if isinstance(threshold, float) else nn.Parameter(torch.tensor(threshold))
+        self.threshold = nn.Parameter(torch.tensor(threshold, dtype=torch.float32))
         self.alpha = nn.Parameter(torch.zeros(dim, 1, 1))
 
         self.norm1 = GNConvBlock(in_ch=dim, out_ch=dim, num_groups=8)

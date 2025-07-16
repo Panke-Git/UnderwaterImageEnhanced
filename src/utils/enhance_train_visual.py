@@ -67,13 +67,13 @@ def visual_enhance(model_in=None, root_dir='', img=''):
         axs[i, 2].set_title("Ground Truth")
         axs[i, 2].axis("off")
 
-    plt.suptitle(f'Visual Enhancement IMG of {model.model_name}', fontsize=24)
+    # plt.suptitle(f'Visual Enhancement IMG of {model.model_name}', fontsize=24)
     plt.tight_layout()
     plt.subplots_adjust(top=0.95)
-    # plt.show()
-    save_path = os.path.join(root_dir, 'visual_enhance.png')
-    plt.savefig(save_path)
-    plt.close()
+    plt.show()
+    # save_path = os.path.join(root_dir, 'visual_enhance.png')
+    # plt.savefig(save_path)
+    # plt.close()
 
 
 def train_visual(root_dir=''):

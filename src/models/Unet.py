@@ -8,6 +8,7 @@
 
 import torch
 import torch.nn as nn
+from src.models.block import MPNCOV
 
 
 class ConvBlock(nn.Module):
@@ -74,6 +75,11 @@ class UNet(nn.Module):
         x4 = self.enc4(self.pool3(x3))
 
         # Bottleneck
+        print(x4.shape)
+        x4 = MPNCOV.CovpoolLayer(x4)
+        x4 = x4.view(x4.size(0), x4.size(1), x4.size(2), 1).contiguous()
+        print(x4.shape)
+
         x5 = self.bottleneck(self.pool4(x4))
 
         # Decoder
