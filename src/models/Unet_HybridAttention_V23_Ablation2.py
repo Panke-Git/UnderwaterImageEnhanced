@@ -32,14 +32,14 @@ class ConvBlock(nn.Module):
         return self.double_conv(x)
 
 
-class UnetHybridAttentionV23Ablation1(nn.Module):
+class UnetHybridAttentionV23Ablation2(nn.Module):
     """
-    基于UNetHybridAttentionV8，使用固定阈值，输出每个高频子带的软阈值的稀疏性
+    基于UNetHybridAttentionV8，使用可学习阈值，输出每个高频子带的软阈值的稀疏性
     """
 
     def __init__(self, in_channels=3, out_channels=3, base_c=64):
-        super(UnetHybridAttentionV23Ablation1, self).__init__()
-        self.model_name = 'UnetHybridAttentionV23Ablation1'
+        super(UnetHybridAttentionV23Ablation2, self).__init__()
+        self.model_name = 'UnetHybridAttentionV23Ablation2'
 
         # Down path
         # Layer1
@@ -165,7 +165,7 @@ class HybridAttention(nn.Module):
         return zero_count / total
 
     def forward(self, x):
-        threshold = self.get_effective_threshold()  # ⬅️ 动态阈值获取
+        # threshold = self.get_effective_threshold()  # ⬅️ 动态阈值获取
 
         # ================= 上支 DWT 分支 =================
         Yl, Yh = self.dwt(x)
@@ -175,7 +175,7 @@ class HybridAttention(nn.Module):
         batch_sparsity = []
 
         for j in range(len(Yh)):
-            Yh[j] = self.soft_threshold(Yh[j], threshold)
+            Yh[j] = self.soft_threshold(Yh[j], self.raw_threshold)
 
             if self.training:
                 sparsity = self.calc_sparsity(Yh[j])

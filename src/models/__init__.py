@@ -22,6 +22,7 @@ from .Unet_HybridAttention_V22 import UNetHybridAttentionV22
 from .Unet_HybridAttention_V23 import UNetHybridAttentionV23
 from .Unet_HybridAttention_V23_1 import UNetHybridAttentionV23_1
 from .Unet_HybridAttention_V23_Ablation1 import UnetHybridAttentionV23Ablation1
+from .Unet_HybridAttention_V23_Ablation2 import UnetHybridAttentionV23Ablation2
 from .Unet_HybridAttention_V23_G import UNetHybridAttentionV23G
 from .Unet_HybridAttention_V24 import UNetHybridAttentionV24
 from .Unet_HybridAttention_V25 import UNetHybridAttentionV25
@@ -64,5 +65,6 @@ __all__ = ['UNet',
            'UNetHybridAttentionV25',
            'UNetHybridAttentionV26',
            'UNetHybridAttentionV23G',
-           'UnetHybridAttentionV23Ablation1']
+           'UnetHybridAttentionV23Ablation1',
+           'UnetHybridAttentionV23Ablation2',]
 
