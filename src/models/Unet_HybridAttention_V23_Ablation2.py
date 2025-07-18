@@ -139,7 +139,6 @@ class HybridAttention(nn.Module):
         self.sparsity_accumulator = []
         # self.log_path = log_path
 
-
         self.gate = nn.Sequential(
             nn.Conv2d(dim * 2, dim, kernel_size=1),
             nn.Sigmoid()
@@ -165,7 +164,7 @@ class HybridAttention(nn.Module):
         return zero_count / total
 
     def forward(self, x):
-        # threshold = self.get_effective_threshold()  # ⬅️ 动态阈值获取
+        threshold = self.get_effective_threshold()  # ⬅️ 动态阈值获取
 
         # ================= 上支 DWT 分支 =================
         Yl, Yh = self.dwt(x)
@@ -175,7 +174,7 @@ class HybridAttention(nn.Module):
         batch_sparsity = []
 
         for j in range(len(Yh)):
-            Yh[j] = self.soft_threshold(Yh[j], self.raw_threshold)
+            Yh[j] = self.soft_threshold(Yh[j], threshold)
 
             if self.training:
                 sparsity = self.calc_sparsity(Yh[j])
@@ -186,7 +185,6 @@ class HybridAttention(nn.Module):
             self.sparsity_accumulator.append(batch_sparsity)
 
         D_x = torch.abs(self.idwt((ll, Yh)))
-
 
         # ================ 下支 FFN 分支 ===================
         N_x = self.avg_pool(self.norm1(x))
@@ -205,6 +203,7 @@ class HybridAttention(nn.Module):
         #     self.latest_sparse_loss = 0.0
 
         return out
+
     def log_epoch_stats(self, epoch_num, log_path):
         """每个 epoch 结束时调用此函数，将平均稀疏度 + threshold 写入文件"""
         if not self.sparsity_accumulator:

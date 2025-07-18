@@ -29,5 +29,6 @@
     "UNetHybridAttentionV23G_Balance": "基于UNetHybridAttentionV25，对G使用门控平衡正则化约束；",
     "UNetHybridAttentionV23G_Entropy": "基于UNetHybridAttentionV25，对G使用熵正则化约束；",
     "UNetHybridAttentionV23G_Center": "基于UNetHybridAttentionV25，对G使用中心正则化约束；",
-    "UnetHybridAttentionV23Ablation1": "基于UNetHybridAttentionV8，输出每个高频子带的软阈值的稀疏性"
+    "UnetHybridAttentionV23Ablation1": "基于UNetHybridAttentionV8，输出每个高频子带的软阈值的稀疏性",
+    "UnetHybridAttentionV23Ablation2": "基于UNetHybridAttentionV8，使用可学习阈值，输出每个高频子带的软阈值的稀疏性"
 }

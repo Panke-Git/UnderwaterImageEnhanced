@@ -72,10 +72,10 @@ def train():
     # ========================================================================================
     # ==================================注意修改此值============================================
     # ========================================================================================
-    model = models.UNetHybridAttentionV23G(regularization_type='entropy').to(device)
-    model_description = '基于UNetHybridAttentionV25，对G使用熵正则化约束；'
-    model_name = 'UNetHybridAttentionV23G_Entropy'
-    # model_name = model.model_name
+    model = models.UnetHybridAttentionV23Ablation2().to(device)
+    model_description = '基于UNetHybridAttentionV8，使用可学习阈值，输出每个高频子带的软阈值的稀疏性'
+    # model_name = 'UnetHybridAttentionV23Ablation2'
+    model_name = model.model_name
     expt_id = generate_experiment_id(model=model_name,
                                      dataset='LSUI',
                                      loss='SmoothL1Loss',
@@ -133,22 +133,18 @@ def train():
             inp, target = data[0].to(device), data[1].to(device)
 
             optimizer_b.zero_grad()
-            res, reg1, reg2 = model(inp)
+            res = model(inp)
             loss_psnr = criterion_psnr(res, target)
             ssim_val = structural_similarity_index_measure(res, target, data_range=1)
 
             loss_ssim = 1 - ssim_val
 
-            lam1 = 0.01
-            lam2 = 0.01
-            reg_loss = 0.0
-            if reg1 is not None:
-                reg_loss += lam1 * reg1
-            if reg2 is not None:
-                reg_loss += lam2 * reg2
-            train_loss = loss_psnr + loss_ssim * 0.2 + reg_loss
+            train_loss = loss_psnr + loss_ssim * 0.2
             train_loss.backward()
             optimizer_b.step()
+
+        model.hybrid_attention1.log_epoch_stats(epoch, os.path.join(record_path, 'att1_log.txt'))
+        model.hybrid_attention2.log_epoch_stats(epoch, os.path.join(record_path, 'att2_log.txt'))
         scheduler_b.step()
         logger.writer.add_scalar('train/loss', train_loss.item(), epoch)
 
@@ -160,7 +156,7 @@ def train():
             with torch.no_grad():
                 for data in tqdm(val_loader):
                     inp, target = data[0].to(device), data[1].to(device)
-                    res, _, _ = model(inp)
+                    res= model(inp)
                     val_loss = criterion_psnr(res, target)
                     psnr = peak_signal_noise_ratio(res, target, data_range=1).item()
                     psnr_total += psnr
@@ -168,7 +164,6 @@ def train():
                     ssim_total += ssim
                     # alpha1 = model.hybrid_attention1.alpha.detach().cpu().squeeze().tolist()
                     # alpha2 = model.hybrid_attention2.alpha.detach().cpu().squeeze().tolist()
-
             psnr = psnr_total / size
             ssim = ssim_total / size
             metrics = {
