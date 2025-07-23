@@ -6,6 +6,7 @@
     @Email: None
 """
 import os
+import time
 from datetime import datetime
 
 import torch
@@ -30,6 +31,7 @@ warnings.filterwarnings("ignore", message="Error fetching version info")
 
 
 def train():
+    time.sleep(1)
     config = Config.load(r'./src/config/config.yaml')
     # show_banner()
     # 开始时间
@@ -37,7 +39,7 @@ def train():
     # 注册log输出
     logger = ExperimentLogger(config.PROJECT.LOG_DIR, start_time)
     # 设置随机种子
-    seed_everything(3407)
+    seed_everything(9861)
     # 项目根路径，训练数据集路径，验证数据集路径
     root_path = config.PROJECT.ROOT_PATH
     train_dir = config.PROJECT.TRAIN_DIR
@@ -72,12 +74,12 @@ def train():
     # ========================================================================================
     # ==================================注意修改此值============================================
     # ========================================================================================
-    model = models.UnetHybridAttentionV23Ablation1().to(device)
-    model_description = '基于UNetHybridAttentionV8，使用固定阈值，输出每个高频子带的软阈值的稀疏性'
+    model = models.UNetHybridAttentionV23().to(device)
+    model_description = '基于UNetHybridAttentionV23；使用UIEB19数据集'
     model_name = model.model_name
     # model_name = 'UNetHybridAttentionV23_2'
     expt_id = generate_experiment_id(model=model_name,
-                                     dataset='LSUI',
+                                     dataset='UIEB19',
                                      loss='SmoothL1Loss',
                                      note='')
     # ========================================================================================
@@ -104,7 +106,7 @@ def train():
                                                       scheduler=str(scheduler_b),
                                                       optimizer=str(optimizer_b),
                                                       dataset=train_dir,
-                                                      regularization='Center Constraint'
+                                                      seed_value = 9861
                                                       )
     record_utils.record_model_description(
         os.path.join(config.PROJECT.ROOT_PATH, 'src', 'models', '01_ModelDescription.json'),
@@ -142,8 +144,8 @@ def train():
             train_loss = loss_psnr + loss_ssim * 0.2
             train_loss.backward()
             optimizer_b.step()
-        model.hybrid_attention1.log_epoch_stats(epoch, os.path.join(record_path, 'att1_log.txt'))
-        model.hybrid_attention2.log_epoch_stats(epoch, os.path.join(record_path, 'att2_log.txt'))
+        # model.hybrid_attention1.log_epoch_stats(epoch, os.path.join(record_path, 'att1_log.txt'))
+        # model.hybrid_attention2.log_epoch_stats(epoch, os.path.join(record_path, 'att2_log.txt'))
         scheduler_b.step()
         logger.writer.add_scalar('train/loss', train_loss.item(), epoch)
 
@@ -155,7 +157,7 @@ def train():
             with torch.no_grad():
                 for data in tqdm(val_loader):
                     inp, target = data[0].to(device), data[1].to(device)
-                    res= model(inp)
+                    res = model(inp)
                     val_loss = criterion_psnr(res, target)
                     psnr = peak_signal_noise_ratio(res, target, data_range=1).item()
                     psnr_total += psnr

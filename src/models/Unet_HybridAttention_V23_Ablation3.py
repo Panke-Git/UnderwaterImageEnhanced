@@ -5,12 +5,10 @@
     @Time: 2025/6/2 01:29
     @Email: None
 """
-import os
 
 import torch
 import torch.nn as nn
 from pytorch_wavelets import DWTForward, DWTInverse
-import torch.nn.functional as F
 
 
 class ConvBlock(nn.Module):
@@ -32,14 +30,14 @@ class ConvBlock(nn.Module):
         return self.double_conv(x)
 
 
-class UnetHybridAttentionV23Ablation1(nn.Module):
+class UNetHybridAttentionV23Ablation3(nn.Module):
     """
-    基于UNetHybridAttentionV8，使用固定阈值，输出每个高频子带的软阈值的稀疏性
+    基于UNetHybridAttentionV8，使用固定阈值，下采样的阈值设置为0.02，上采样的阈值设置为0.2，并记录稀疏性；
     """
 
     def __init__(self, in_channels=3, out_channels=3, base_c=64):
-        super(UnetHybridAttentionV23Ablation1, self).__init__()
-        self.model_name = 'UnetHybridAttentionV23Ablation1'
+        super(UNetHybridAttentionV23Ablation3, self).__init__()
+        self.model_name = 'UNetHybridAttentionV23Ablation3'
 
         # Down path
         # Layer1
@@ -51,7 +49,7 @@ class UnetHybridAttentionV23Ablation1(nn.Module):
 
         # Layer3
         # self.enc3 = ConvBlock(base_c * 2, base_c * 4)
-        self.hybrid_attention1 = HybridAttention(base_c * 2)
+        self.hybrid_attention1 = HybridAttention(base_c * 2, threshold=0.02)
         self.conv1 = nn.Conv2d(base_c * 2, base_c * 4, kernel_size=3, padding=1)
         self.bn1 = nn.BatchNorm2d(base_c * 4)
         self.pool3 = nn.MaxPool2d(2)
@@ -68,7 +66,7 @@ class UnetHybridAttentionV23Ablation1(nn.Module):
         self.dec4 = ConvBlock(base_c * 16, base_c * 8)
         # Layer3
         self.up3 = nn.ConvTranspose2d(base_c * 8, base_c * 4, kernel_size=2, stride=2)
-        self.hybrid_attention2 = HybridAttention(base_c * 4)
+        self.hybrid_attention2 = HybridAttention(base_c * 4, threshold=0.2)
         self.conv2 = nn.Conv2d(base_c * 8, base_c * 4, kernel_size=3, padding=1)
         # self.dec3 = ConvBlock(base_c * 8, base_c * 4)
         # Layer2
@@ -118,19 +116,15 @@ class HybridAttention(nn.Module):
         super(HybridAttention, self).__init__()
         self.dwt = DWTForward(J=1, mode='zero', wave='haar')
         self.idwt = DWTInverse(mode='zero', wave='haar')
-        self.raw_threshold = threshold if isinstance(threshold, float) else nn.Parameter(torch.tensor(threshold))
+        self.threshold = threshold if isinstance(threshold, float) else nn.Parameter(torch.tensor(threshold))
         # self.threshold = nn.Parameter(torch.tensor(threshold, dtype=torch.float32))
         self.alpha = nn.Parameter(torch.zeros(dim, 1, 1))
-
-        self.min_eps = 1e-2
 
         self.norm1 = GNConvBlock(in_ch=dim, out_ch=dim, num_groups=8)
         self.norm2 = GNConvBlock(in_ch=dim, out_ch=dim, num_groups=8)
         self.avg_pool = nn.AdaptiveAvgPool2d((1, 1))
         self.dw_ffn = DW_FFN(dim)
-
         self.sparsity_accumulator = []
-
         self.gate = nn.Sequential(
             nn.Conv2d(dim * 2, dim, kernel_size=1),
             nn.Sigmoid()
@@ -153,7 +147,7 @@ class HybridAttention(nn.Module):
         # 转置累积列表：batch × 3 → 3 × batch
         Yh_by_subband = list(zip(*self.sparsity_accumulator))  # Yh[0~2]
         avg_sparsities = [sum(x) / len(x) for x in Yh_by_subband]
-        threshold_val = self.raw_threshold
+        threshold_val = self.threshold
 
         # 写入日志
         with open(log_path, "a") as f:
@@ -161,7 +155,7 @@ class HybridAttention(nn.Module):
             for j, s in enumerate(avg_sparsities):
                 f.write(f"    Yh[{j}] avg sparsity: {s:.4f}\n")
             f.write("\n")
-
+        f.close()
         # 清空缓存
         self.sparsity_accumulator.clear()
 
@@ -171,11 +165,10 @@ class HybridAttention(nn.Module):
         ll = Yl * self.alpha
         batch_sparsity = []
         for j in range(len(Yh)):
-            Yh[j] = self.soft_threshold(Yh[j], self.raw_threshold)
+            Yh[j] = self.soft_threshold(Yh[j], self.threshold)
             if self.training:
                 sparsity = self.calc_sparsity(Yh[j])
                 batch_sparsity.append(sparsity)
-
         if self.training and batch_sparsity:
             self.sparsity_accumulator.append(batch_sparsity)
 

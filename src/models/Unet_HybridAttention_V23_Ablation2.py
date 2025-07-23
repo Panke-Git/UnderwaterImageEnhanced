@@ -169,8 +169,6 @@ class HybridAttention(nn.Module):
         # ================= 上支 DWT 分支 =================
         Yl, Yh = self.dwt(x)
         ll = Yl * self.alpha
-
-        sparse_losses = []
         batch_sparsity = []
 
         for j in range(len(Yh)):
@@ -179,8 +177,6 @@ class HybridAttention(nn.Module):
             if self.training:
                 sparsity = self.calc_sparsity(Yh[j])
                 batch_sparsity.append(sparsity)
-                sparse_losses.append(torch.mean(torch.abs(Yh[j])))
-
         if self.training and batch_sparsity:
             self.sparsity_accumulator.append(batch_sparsity)
 

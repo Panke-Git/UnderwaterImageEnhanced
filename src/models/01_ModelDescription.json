@@ -30,5 +30,7 @@
     "UNetHybridAttentionV23G_Entropy": "基于UNetHybridAttentionV25，对G使用熵正则化约束；",
     "UNetHybridAttentionV23G_Center": "基于UNetHybridAttentionV25，对G使用中心正则化约束；",
     "UnetHybridAttentionV23Ablation1": "基于UNetHybridAttentionV8，输出每个高频子带的软阈值的稀疏性",
-    "UnetHybridAttentionV23Ablation2": "基于UNetHybridAttentionV8，使用可学习阈值，输出每个高频子带的软阈值的稀疏性"
+    "UnetHybridAttentionV23Ablation2": "基于UNetHybridAttentionV8，使用可学习阈值，输出每个高频子带的软阈值的稀疏性",
+    "UNetHybridAttentionV23Ablation4": "基于原始UNetHybridAttentionV23，将HybridAttention的下采样阈值改为0.02，上采样阈值改为0.2；没有记录稀疏性；",
+    "UNetHybridAttentionV23Ablation3": "基于UNetHybridAttentionV8，使用固定阈值，下采样的阈值设置为0.02，上采样的阈值设置为0.2，并记录稀疏性；"
 }

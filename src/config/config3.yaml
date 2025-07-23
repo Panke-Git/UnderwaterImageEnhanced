@@ -3,8 +3,8 @@ MODEL:
 
 PROJECT:
   ROOT_PATH: /root/cyx/CL/PRO/MyPro/UnderwaterImageEnhanced/
-  TRAIN_DIR: /root/cyx/CL/PRO/MyPro/UnderwaterImageEnhanced/dataset/LSUIN/Train
-  VAL_DIR: /root/cyx/CL/PRO/MyPro/UnderwaterImageEnhanced/dataset/LSUIN/Val
+  TRAIN_DIR: /root/cyx/CL/PRO/MyPro/UnderwaterImageEnhanced/dataset/LSUI19/Train
+  VAL_DIR: /root/cyx/CL/PRO/MyPro/UnderwaterImageEnhanced/dataset/LSUI19/Val
   SAVE_DIR: /root/cyx/CL/PRO/MyPro/UnderwaterImageEnhanced/save_dir
   EXPT_RECORD_DIR: /root/cyx/CL/PRO/MyPro/UnderwaterImageEnhanced/expt_record
   LOG_DIR: /root/cyx/CL/PRO/MyPro/UnderwaterImageEnhanced/log
@@ -16,7 +16,7 @@ DATASET:
   TARGET: 'GT'
 
 TRAIN:
-  DEVICE: 'cuda:3'
+  DEVICE: 'cuda:4'
   VAL_AFTER_EVERY: 1
   RESUME: False
   WEIGHT: ''

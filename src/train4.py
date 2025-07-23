@@ -6,6 +6,7 @@
     @Email: None
 """
 import os
+import time
 from datetime import datetime
 
 import torch
@@ -30,6 +31,7 @@ warnings.filterwarnings("ignore", message="Error fetching version info")
 
 
 def train():
+    time.sleep(15)
     config = Config.load(r'./src/config/config4.yaml')
     # show_banner()
     # 开始时间
@@ -72,12 +74,12 @@ def train():
     # ========================================================================================
     # ==================================注意修改此值============================================
     # ========================================================================================
-    model = models.UNetHybridAttentionV23G(regularization_type='balance').to(device)
-    model_description = '基于UNetHybridAttentionV25，对G使用门控平衡正则化约束；'
-    model_name = 'UNetHybridAttentionV23G_Balance'
-    # model_name = model.model_name
+    model = models.UNet().to(device)
+    model_description = '基础Unet，使用LSUI19数据集'
+    # model_name = 'UNetHybridAttentionV23G_Balance'
+    model_name = model.model_name
     expt_id = generate_experiment_id(model=model_name,
-                                     dataset='LSUI',
+                                     dataset='LSUI19',
                                      loss='SmoothL1Loss',
                                      note='')
     # ========================================================================================
@@ -104,7 +106,7 @@ def train():
                                                       scheduler=str(scheduler_b),
                                                       optimizer=str(optimizer_b),
                                                       dataset=train_dir,
-                                                      regularization='Gating Balance Regularization'
+                                                      seed_value = 9861
                                                       )
     record_utils.record_model_description(
         os.path.join(config.PROJECT.ROOT_PATH, 'src', 'models', '01_ModelDescription.json'),
@@ -133,20 +135,13 @@ def train():
             inp, target = data[0].to(device), data[1].to(device)
 
             optimizer_b.zero_grad()
-            res, reg1, reg2 = model(inp)
+            res = model(inp)
             loss_psnr = criterion_psnr(res, target)
             ssim_val = structural_similarity_index_measure(res, target, data_range=1)
 
             loss_ssim = 1 - ssim_val
 
-            lam1 = 0.01
-            lam2 = 0.01
-            reg_loss = 0.0
-            if reg1 is not None:
-                reg_loss += lam1 * reg1
-            if reg2 is not None:
-                reg_loss += lam2 * reg2
-            train_loss = loss_psnr + loss_ssim * 0.2 + reg_loss
+            train_loss = loss_psnr + loss_ssim * 0.2
             train_loss.backward()
             optimizer_b.step()
         scheduler_b.step()
@@ -161,7 +156,7 @@ def train():
             with torch.no_grad():
                 for data in tqdm(val_loader):
                     inp, target = data[0].to(device), data[1].to(device)
-                    res, _, _  = model(inp)
+                    res = model(inp)
                     val_loss = criterion_psnr(res, target)
                     psnr = peak_signal_noise_ratio(res, target, data_range=1).item()
                     psnr_total += psnr

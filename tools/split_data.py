@@ -13,7 +13,7 @@ def is_image_file(filename):
     """检查文件是否为图片格式"""
     return any(filename.endswith(extension) for extension in ['jpeg', 'JPEG', 'jpg', 'png', 'JPG', 'PNG', 'gif'])
 
-def split_and_copy_dataset(src_dir, input_subdir, target_subdir, train_dir, val_dir, test_size=0.2, random_state=42):
+def split_and_copy_dataset(src_dir, input_subdir, target_subdir, train_dir, val_dir, test_size=0.1, random_state=42):
     """
     划分数据集为训练集和验证集，并将其拷贝到指定目录
     :param src_dir: 数据集的根目录
@@ -58,12 +58,12 @@ def copy_files(file_list, dest_dir, subfolder):
 
 if __name__ == '__main__':
     # 示例使用
-    src_dir = r'E:\PythonProject\01_Personal\UnderWater\data\LSUI'  # 替换为你的数据集路径
+    src_dir = r'E:\PythonProject\01_Personal\UnderwaterImageEnhanced\dataset\UIEB'  # 替换为你的数据集路径
     input_subdir = 'input'
     target_subdir = 'GT'
 
-    train_dir = r'E:\PythonProject\01_Personal\UnderWater\data\LSUIN\Train' # 替换为你的训练集保存路径
-    val_dir = r'E:\PythonProject\01_Personal\UnderWater\data\LSUIN\Val'# 替换为你的验证集保存路径
+    train_dir = r'E:\PythonProject\01_Personal\UnderwaterImageEnhanced\dataset\UIEB19\Train' # 替换为你的训练集保存路径
+    val_dir = r'E:\PythonProject\01_Personal\UnderwaterImageEnhanced\dataset\UIEB19\Val'# 替换为你的验证集保存路径
 
-    split_and_copy_dataset(src_dir, input_subdir, target_subdir, train_dir, val_dir, test_size=0.2)
+    split_and_copy_dataset(src_dir, input_subdir, target_subdir, train_dir, val_dir, test_size=0.1)
 
