@@ -2,13 +2,13 @@ MODEL:
   SESSION: "Paxton"
 
 PROJECT:
-  ROOT_PATH: /root/cyx/CL/PRO/MyPro/UnderwaterImageEnhanced/
-  TRAIN_DIR: /root/cyx/CL/PRO/MyPro/UnderwaterImageEnhanced/dataset/LSUI19/Train
-  VAL_DIR: /root/cyx/CL/PRO/MyPro/UnderwaterImageEnhanced/dataset/LSUI19/Val
-  SAVE_DIR: /root/cyx/CL/PRO/MyPro/UnderwaterImageEnhanced/save_dir
-  EXPT_RECORD_DIR: /root/cyx/CL/PRO/MyPro/UnderwaterImageEnhanced/expt_record
-  LOG_DIR: /root/cyx/CL/PRO/MyPro/UnderwaterImageEnhanced/log
-  VISUAL_DATA: /root/cyx/CL/PRO/MyPro/UnderwaterImageEnhanced/dataset/visual_img
+  ROOT_PATH: /public/home/hnust15874739861/pro/UnderwaterImageEnhanced/
+  TRAIN_DIR: /public/home/hnust15874739861/pro/UnderwaterImageEnhanced/dataset/LSUI19/Train
+  VAL_DIR: /public/home/hnust15874739861/pro/UnderwaterImageEnhanced/dataset/LSUI19/Val
+  SAVE_DIR: /public/home/hnust15874739861/pro/UnderwaterImageEnhanced/save_dir
+  EXPT_RECORD_DIR: /public/home/hnust15874739861/pro/UnderwaterImageEnhanced/expt_record
+  LOG_DIR: /public/home/hnust15874739861/pro/UnderwaterImageEnhanced/log
+  VISUAL_DATA: /public/home/hnust15874739861/pro/UnderwaterImageEnhanced/dataset/visual_img
 
 
 DATASET:

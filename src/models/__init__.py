@@ -21,8 +21,13 @@ from .Unet_HybridAttention_V21 import UNetHybridAttentionV21
 from .Unet_HybridAttention_V22 import UNetHybridAttentionV22
 from .Unet_HybridAttention_V23 import UNetHybridAttentionV23
 from .Unet_HybridAttention_V23_1 import UNetHybridAttentionV23_1
-from .Unet_HybridAttention_V23_Ablation1 import UnetHybridAttentionV23Ablation1
-from .Unet_HybridAttention_V23_Ablation2 import UnetHybridAttentionV23Ablation2
+from .Unet_HybridAttention_V23_2 import UNetHybridAttentionV23_2
+from .Unet_HybridAttention_V23_2_Ablation1 import UNetHybridAttentionV23_2_Ablation1
+from .Unet_HybridAttention_V23_2_Ablation2 import UNetHybridAttentionV23_2_Ablation2
+from .Unet_HybridAttention_V23_2_Ablation3 import UNetHybridAttentionV23_2_Ablation3
+from .Unet_HybridAttention_V23_2_NoThreshold import UNetHybridAttentionV23_2_NoThreshold
+from .Unet_HybridAttention_V23_2_fixed import UnetHybridAttentionV23_2_fixed
+from .Unet_HybridAttention_V23_2_Learnable import UnetHybridAttentionV23_2_Learnable
 from .Unet_HybridAttention_V23_Ablation3 import UNetHybridAttentionV23Ablation3
 from .Unet_HybridAttention_V23_Ablation4 import UNetHybridAttentionV23Ablation4
 from .Unet_HybridAttention_V23_G import UNetHybridAttentionV23G
@@ -37,6 +42,7 @@ from .Unet_HybridAttention_V7 import UNetHybridAttentionV7
 from .Unet_HybridAttention_V8 import UNetHybridAttentionV8
 from .Unet_HybridAttention_V9 import UNetHybridAttentionV9
 from .Unet_HybridAttention_V20 import UNetHybridAttentionV20
+from .Unet_HybridAttention_V23_2 import UNetHybridAttentionV23_2
 
 
 __all__ = ['UNet',
@@ -67,8 +73,13 @@ __all__ = ['UNet',
            'UNetHybridAttentionV25',
            'UNetHybridAttentionV26',
            'UNetHybridAttentionV23G',
-           'UnetHybridAttentionV23Ablation1',
-           'UnetHybridAttentionV23Ablation2',
+           'UnetHybridAttentionV23_2_fixed',
+           'UnetHybridAttentionV23_2_Learnable',
            'UNetHybridAttentionV23Ablation3',
-           'UNetHybridAttentionV23Ablation4']
+           'UNetHybridAttentionV23Ablation4',
+           'UNetHybridAttentionV23_2',
+           'UNetHybridAttentionV23_2_NoThreshold',
+           'UNetHybridAttentionV23_2_Ablation1',
+           'UNetHybridAttentionV23_2_Ablation2',
+           'UNetHybridAttentionV23_2_Ablation3']
 

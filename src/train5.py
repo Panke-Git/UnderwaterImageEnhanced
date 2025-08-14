@@ -35,7 +35,7 @@ warnings.filterwarnings("ignore", message="Error fetching version info")
 
 def train():
     time.sleep(1)
-    config = Config.load(r'/public/home/hnust15874739861/pro/UnderwaterImageEnhanced/src/config/config.yaml')
+    config = Config.load(r'/public/home/hnust15874739861/pro/UnderwaterImageEnhanced/src/config/config5.yaml')
     # show_banner()
     # 开始时间
     start_time = datetime.now().strftime('%Y%m%d_%H%M%S')
@@ -78,8 +78,8 @@ def train():
     # ========================================================================================
     # ==================================注意修改此值============================================
     # ========================================================================================
-    model = models.UNet().to(device)
-    model_description = '基础UNet'
+    model = models.UnetHybridAttentionV23_2_fixed().to(device)
+    model_description = '基于UNetHybridAttentionV8，使用固定阈值，输出每个高频子带的软阈值的稀疏性'
     model_name = model.model_name
     # model_name = 'UNetHybridAttentionV23_2'
     expt_id = generate_experiment_id(model=model_name,
@@ -118,7 +118,7 @@ def train():
     print("配置信息保存至: ", config_file_path, "下!")
     tdr = train_dir.split('/')[-2]
     print(f'本次训练配置: epoch: {epochs}, dataset: {tdr}, batch_size: {config.TRAIN.BATCH_SIZE}')
-    
+
     top_psnr = 0.0
     top_ssim = 0.0
     sum_psnr_ssim = 0.0
@@ -157,6 +157,10 @@ def train():
 
             train_loss_total += train_loss.item()
             num_train_batches += 1
+
+
+        model.hybrid_attention1.log_epoch_stats(epoch, os.path.join(record_path, 'att1_log.txt'))
+        model.hybrid_attention2.log_epoch_stats(epoch, os.path.join(record_path, 'att2_log.txt'))
 
         epoch_train_loss = train_loss_total / max(1, num_train_batches)
         scheduler_b.step()

@@ -12,7 +12,7 @@ import tempfile
 
 import pandas as pd
 
-from src.utils.config import Config
+from utils.config import Config
 
 
 def make_train_path(record_path, model_name, start_time):

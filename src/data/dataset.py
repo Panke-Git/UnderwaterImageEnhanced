@@ -13,7 +13,7 @@ from PIL import Image
 from torch.utils.data import Dataset
 import random
 
-from tools.split_data import is_image_file
+from .split_data import is_image_file
 
 
 def is_image_file(filename):
