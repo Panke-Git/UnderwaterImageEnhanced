@@ -114,6 +114,8 @@ class UNetHybridAttentionV23Ablation3(nn.Module):
 class HybridAttention(nn.Module):
     def __init__(self, dim, threshold=0.05):
         super(HybridAttention, self).__init__()
+        self.conv = nn.Conv2d(dim, dim, kernel_size=3, padding=1)
+
         self.dwt = DWTForward(J=1, mode='zero', wave='haar')
         self.idwt = DWTInverse(mode='zero', wave='haar')
         self.threshold = threshold if isinstance(threshold, float) else nn.Parameter(torch.tensor(threshold))

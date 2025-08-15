@@ -121,6 +121,7 @@ class HybridAttention(nn.Module):
         :param enable_sparse_reg: 是否启用稀疏正则项（用于训练时调用）
         """
         super(HybridAttention, self).__init__()
+        self.conv = nn.Conv2d(dim, dim, kernel_size=3, padding=1)
         self.dwt = DWTForward(J=1, mode='zero', wave='haar')
         self.idwt = DWTInverse(mode='zero', wave='haar')
 
@@ -167,6 +168,7 @@ class HybridAttention(nn.Module):
         threshold = self.get_effective_threshold()  # ⬅️ 动态阈值获取
 
         # ================= 上支 DWT 分支 =================
+        x = self.conv(x)
         Yl, Yh = self.dwt(x)
         ll = Yl * self.alpha
         batch_sparsity = []
