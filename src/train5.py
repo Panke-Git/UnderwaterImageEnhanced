@@ -78,12 +78,12 @@ def train():
     # ========================================================================================
     # ==================================注意修改此值============================================
     # ========================================================================================
-    model = models.UnetHybridAttentionV23_2_fixed().to(device)
-    model_description = '基于UNetHybridAttentionV8，使用固定阈值，输出每个高频子带的软阈值的稀疏性'
+    model = models.UNetHybridAttentionV23_2().to(device)
+    model_description = '基于UNetHybridAttentionV23，将HybridAttention前边加入卷积；'
     model_name = model.model_name
     # model_name = 'UNetHybridAttentionV23_2'
     expt_id = generate_experiment_id(model=model_name,
-                                     dataset='LSUI19',
+                                     dataset='UIEB19',
                                      loss='SmoothL1Loss',
                                      note='')
     # ========================================================================================

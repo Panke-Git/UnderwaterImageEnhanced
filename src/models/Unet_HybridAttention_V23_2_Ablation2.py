@@ -138,7 +138,7 @@ class HybridAttention(nn.Module):
         return torch.sign(x) * torch.clamp(torch.abs(x) - thresh, min=0.0)
 
     def forward(self, x):
-        # x = self.conv(x)
+        x = self.conv(x)
         # # 上边的分支，DWT部分
         # Yl, Yh = self.dwt(x)
         # ll = Yl * self.alpha

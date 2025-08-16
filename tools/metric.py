@@ -24,9 +24,9 @@ def main():
     # ----------------- 初始化模型 -----------------
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     print(device)
-    model = mode.UNetHybridAttentionV23_2().to(device)
+    model = mode.UNetHybridAttentionV23_2_Ablation2().to(device)
     model.load_state_dict(torch.load(
-        r"E:\PythonProject\01_Personal\UnderwaterImageEnhanced\expt_record\UNetHybridAttentionV23_2\20250725_013205\best_result\TOP_PSNR.pth",
+        r"E:\PythonProject\01_Personal\UnderwaterImageEnhanced\expt_record_HNUST\UNetHybridAttentionV23_2_Ablation2\20250813_142252\best_result\TOP_PSNR.pth",
         map_location=device))
     model.eval()
 
@@ -47,6 +47,7 @@ def main():
 
     # ----------------- 初始化 LPIPS -----------------
     lpips_fn = lpips.LPIPS(net='alex').to(device)
+    lpips_fn.eval()
 
     # ----------------- 工具函数 -----------------
     def normalize_for_lpips(x):
@@ -94,7 +95,9 @@ def main():
                     pred_np,
                     data_range=1.0,
                     channel_axis=-1,
-                    win_size=win_size
+                    win_size=win_size,
+                    gaussian_weights=True,  # 推荐与经典实现对齐
+                    sigma=1.5
                 )
 
                 total_psnr += psnr
@@ -102,7 +105,7 @@ def main():
                 count += 1
 
     # ----------------- 输出结果 -----------------
-    print("\nDataset: LSUI19, Model: UNet")
+    # print("\nDataset: LSUI19, Model: UNet")
     print('--------------------------------')
     print(f"✅ Average PSNR : {total_psnr / count:.4f} dB")
     print(f"✅ Average SSIM : {total_ssim / count:.4f}")
