@@ -34,5 +34,9 @@
     "UNetHybridAttentionV23Ablation4": "基于原始UNetHybridAttentionV23，将HybridAttention的下采样阈值改为0.02，上采样阈值改为0.2；没有记录稀疏性；",
     "UNetHybridAttentionV23Ablation3": "基于UNetHybridAttentionV8，使用固定阈值，下采样的阈值设置为0.02，上采样的阈值设置为0.2，并记录稀疏性；",
     "UNetHybridAttentionV23_2": "UNetHybridAttentionV23，HybridAttention前边加入1*1卷积；使用LSUI19数据集",
-    "SFGNet": "复现SFGNet"
+    "SFGNet": "复现SFGNet",
+    "UNetHybridAttentionV23_2_NoThreshold": "基于UNetHybridAttentionV23_2, 去掉软阈值；",
+    "UnetHybridAttentionV23_2_Learnable": "基于UNetHybridAttentionV8，使用可学习阈值，输出每个高频子带的软阈值的稀疏性",
+    "UnetHybridAttentionV23_2_fixed": "基于UNetHybridAttentionV8，使用固定阈值，输出每个高频子带的软阈值的稀疏性",
+    "UNetHybridAttentionV23_2_Ablation2": "基于UNetHybridAttentionV23_2,仅保留归一化流"
 }
