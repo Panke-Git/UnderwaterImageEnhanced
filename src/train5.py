@@ -83,7 +83,7 @@ def train():
     model_name = model.model_name
     # model_name = 'UNetHybridAttentionV23_2'
     expt_id = generate_experiment_id(model=model_name,
-                                     dataset='UIEB19',
+                                     dataset='LSUI19',
                                      loss='SmoothL1Loss',
                                      note='')
     # ========================================================================================
