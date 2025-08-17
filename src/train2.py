@@ -183,7 +183,7 @@ def train():
                     ssim_batch = structural_similarity_index_measure(res, target, data_range=1)
 
                     # psnr_total += psnr_batch.item() * B
-                    psnr_total = psnr_each.sum().item()
+                    psnr_total += psnr_each.sum().item()
                     ssim_total += ssim_batch.item() * B
                     num_images += B
 

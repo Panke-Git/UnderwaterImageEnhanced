@@ -158,8 +158,8 @@ def train():
             train_loss_total += train_loss.item()
             num_train_batches += 1
 
-        # model.hybrid_attention1.log_epoch_stats(epoch, os.path.join(record_path, 'att1_log.txt'))
-        # model.hybrid_attention2.log_epoch_stats(epoch, os.path.join(record_path, 'att2_log.txt'))
+        model.hybrid_attention1.log_epoch_stats(epoch, os.path.join(record_path, 'att1_log.txt'))
+        model.hybrid_attention2.log_epoch_stats(epoch, os.path.join(record_path, 'att2_log.txt'))
 
         epoch_train_loss = train_loss_total / max(1, num_train_batches)
         scheduler_b.step()
@@ -186,7 +186,7 @@ def train():
                     ssim_batch = structural_similarity_index_measure(res, target, data_range=1)
 
                     # psnr_total += psnr_batch.item() * B
-                    psnr_total = psnr_each.sum().item()
+                    psnr_total += psnr_each.sum().item()
                     ssim_total += ssim_batch.item() * B
                     num_images += B
 
