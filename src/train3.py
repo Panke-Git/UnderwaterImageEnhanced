@@ -180,7 +180,7 @@ def train():
 
                     B = res.size(0)
                     # psnr_batch = peak_signal_noise_ratio(res, target, data_range=1)
-                    psnr_each = peak_signal_noise_ratio(res, target, data_range=1.0, reduction='none')
+                    psnr_each = peak_signal_noise_ratio(res, target, data_range=1.0, dim=(1, 2, 3), reduction='none')
                     ssim_batch = structural_similarity_index_measure(res, target, data_range=1)
 
                     # psnr_total += psnr_batch.item() * B
