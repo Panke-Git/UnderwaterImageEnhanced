@@ -78,8 +78,8 @@ def train():
     # ========================================================================================
     # ==================================注意修改此值============================================
     # ========================================================================================
-    model = models.UNetHybridAttentionV23_2_Ablation2().to(device)
-    model_description = '基于UNetHybridAttentionV23_2,仅保留归一化流'
+    model = models.UNetHybridAttentionV23_2_NoThreshold().to(device)
+    model_description = '基于UNetHybridAttentionV23_2, 去掉软阈值；'
     model_name = model.model_name
     # model_name = 'UNetHybridAttentionV23_2'
     expt_id = generate_experiment_id(model=model_name,
@@ -179,10 +179,12 @@ def train():
                     val_loss_total += batch_loss.item()
 
                     B = res.size(0)
-                    psnr_batch = peak_signal_noise_ratio(res, target, data_range=1)
+                    # psnr_batch = peak_signal_noise_ratio(res, target, data_range=1)
+                    psnr_each = peak_signal_noise_ratio(res, target, data_range=1.0, reduction='none')
                     ssim_batch = structural_similarity_index_measure(res, target, data_range=1)
 
-                    psnr_total += psnr_batch.item() * B
+                    # psnr_total += psnr_batch.item() * B
+                    psnr_total = psnr_each.sum().item()
                     ssim_total += ssim_batch.item() * B
                     num_images += B
 

@@ -178,10 +178,12 @@ def train():
                     val_loss_total += batch_loss.item()
 
                     B = res.size(0)
-                    psnr_batch = peak_signal_noise_ratio(res, target, data_range=1)
+                    # psnr_batch = peak_signal_noise_ratio(res, target, data_range=1)
+                    psnr_each = peak_signal_noise_ratio(res, target, data_range=1.0, reduction='none')
                     ssim_batch = structural_similarity_index_measure(res, target, data_range=1)
 
-                    psnr_total += psnr_batch.item() * B
+                    # psnr_total += psnr_batch.item() * B
+                    psnr_total = psnr_each.sum().item()
                     ssim_total += ssim_batch.item() * B
                     num_images += B
 

@@ -78,8 +78,8 @@ def train():
     # ========================================================================================
     # ==================================注意修改此值============================================
     # ========================================================================================
-    model = models.UNetHybridAttentionV23_2().to(device)
-    model_description = '基于UNetHybridAttentionV23，将HybridAttention前边加入卷积；'
+    model = models.UnetHybridAttentionV23_2_fixed().to(device)
+    model_description = '基于UNetHybridAttentionV8，使用固定阈值，输出每个高频子带的软阈值的稀疏性'
     model_name = model.model_name
     # model_name = 'UNetHybridAttentionV23_2'
     expt_id = generate_experiment_id(model=model_name,
@@ -182,10 +182,12 @@ def train():
                     val_loss_total += batch_loss.item()
 
                     B = res.size(0)
-                    psnr_batch = peak_signal_noise_ratio(res, target, data_range=1)
+                    # psnr_batch = peak_signal_noise_ratio(res, target, data_range=1)
+                    psnr_each = peak_signal_noise_ratio(res, target, data_range=1.0, reduction='none')
                     ssim_batch = structural_similarity_index_measure(res, target, data_range=1)
 
-                    psnr_total += psnr_batch.item() * B
+                    # psnr_total += psnr_batch.item() * B
+                    psnr_total = psnr_each.sum().item()
                     ssim_total += ssim_batch.item() * B
                     num_images += B
 
