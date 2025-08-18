@@ -38,5 +38,7 @@
     "UNetHybridAttentionV23_2_NoThreshold": "基于UNetHybridAttentionV23_2, 去掉软阈值；",
     "UnetHybridAttentionV23_2_Learnable": "基于UNetHybridAttentionV8，使用可学习阈值，输出每个高频子带的软阈值的稀疏性",
     "UnetHybridAttentionV23_2_fixed": "基于UNetHybridAttentionV8，使用固定阈值，输出每个高频子带的软阈值的稀疏性",
-    "UNetHybridAttentionV23_2_Ablation2": "基于UNetHybridAttentionV23_2,仅保留归一化流"
+    "UNetHybridAttentionV23_2_Ablation2": "基于UNetHybridAttentionV23_2,仅保留归一化流",
+    "UNetHybridAttentionV23_2_Ablation1": "基于UNetHybridAttentionV23_2,仅保留频域分支",
+    "UNetHybridAttentionV23_2_Ablation3": "基于UNetHybridAttentionV23_2, 频域分支和归一化流都保留，不使用门控融合"
 }
