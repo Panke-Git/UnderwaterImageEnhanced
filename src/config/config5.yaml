@@ -16,7 +16,7 @@ DATASET:
   TARGET: 'GT'
 
 TRAIN:
-  DEVICE: 'cuda:2'
+  DEVICE: 'cuda:3'
   VAL_AFTER_EVERY: 1
   RESUME: False
   WEIGHT: ''
