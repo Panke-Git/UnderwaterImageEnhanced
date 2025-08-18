@@ -158,8 +158,8 @@ def train():
             train_loss_total += train_loss.item()
             num_train_batches += 1
 
-        model.hybrid_attention1.log_epoch_stats(epoch, os.path.join(record_path, 'att1_log.txt'))
-        model.hybrid_attention2.log_epoch_stats(epoch, os.path.join(record_path, 'att2_log.txt'))
+        # model.hybrid_attention1.log_epoch_stats(epoch, os.path.join(record_path, 'att1_log.txt'))
+        # model.hybrid_attention2.log_epoch_stats(epoch, os.path.join(record_path, 'att2_log.txt'))
 
         epoch_train_loss = train_loss_total / max(1, num_train_batches)
         scheduler_b.step()
