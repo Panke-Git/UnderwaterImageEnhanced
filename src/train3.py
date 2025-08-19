@@ -78,8 +78,8 @@ def train():
     # ========================================================================================
     # ==================================注意修改此值============================================
     # ========================================================================================
-    model = models.UNetHybridAttentionV23_2_Ablation1().to(device)
-    model_description = '基于UNetHybridAttentionV23_2,仅保留频域分支'
+    model = models.UNetHybridAttentionV23_2().to(device)
+    model_description = '基于UNetHybridAttentionV23，将HybridAttention前边加入卷积；'
     model_name = model.model_name
     # model_name = 'UNetHybridAttentionV23_2'
     expt_id = generate_experiment_id(model=model_name,
