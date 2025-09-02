@@ -3,8 +3,8 @@ MODEL:
 
 PROJECT:
   ROOT_PATH: /public/home/hnust15874739861/pro/UnderwaterImageEnhanced/
-  TRAIN_DIR: /public/home/hnust15874739861/pro/UnderwaterImageEnhanced/dataset/LSUI19/Train
-  VAL_DIR: /public/home/hnust15874739861/pro/UnderwaterImageEnhanced/dataset/LSUI19/Val
+  TRAIN_DIR: /public/home/hnust15874739861/pro/UnderwaterImageEnhanced/dataset/UIEB19/Train
+  VAL_DIR: /public/home/hnust15874739861/pro/UnderwaterImageEnhanced/dataset/UIEB19/Val
   SAVE_DIR: /public/home/hnust15874739861/pro/UnderwaterImageEnhanced/save_dir
   EXPT_RECORD_DIR: /public/home/hnust15874739861/pro/UnderwaterImageEnhanced/expt_record
   LOG_DIR: /public/home/hnust15874739861/pro/UnderwaterImageEnhanced/log
@@ -16,7 +16,7 @@ DATASET:
   TARGET: 'GT'
 
 TRAIN:
-  DEVICE: 'cuda:1'
+  DEVICE: 'cuda:5'
   VAL_AFTER_EVERY: 1
   RESUME: False
   WEIGHT: ''

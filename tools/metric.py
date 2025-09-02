@@ -26,7 +26,7 @@ def main():
     print(device)
     model = mode.UNetHybridAttentionV23_2().to(device)
     model.load_state_dict(torch.load(
-        r"E:\PythonProject\01_Personal\UnderwaterImageEnhanced\expt_record_HNUST\UNetHybridAttentionV23_2\20250819_222858\best_result\TOP_PSNR.pth",
+        r"E:\PythonProject\01_Personal\UnderwaterImageEnhanced\expt_record_HNUST\UNetHybridAttentionV23_2\20250815_190547\best_result\TOP_PSNR.pth",
         map_location=device))
     model.eval()
 
