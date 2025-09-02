@@ -24,9 +24,9 @@ def main():
     # ----------------- 初始化模型 -----------------
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     print(device)
-    model = mode.UNet().to(device)
+    model = mode.UNetHybridAttentionV23_2().to(device)
     model.load_state_dict(torch.load(
-        r"E:\PythonProject\01_Personal\UnderwaterImageEnhanced\expt_record_HNUST\UNet\20250815_190500\best_result\TOP_PSNR.pth",
+        r"E:\PythonProject\01_Personal\UnderwaterImageEnhanced\expt_record_HNUST\UNetHybridAttentionV23_2\20250819_222858\best_result\TOP_PSNR.pth",
         map_location=device))
     model.eval()
 
@@ -34,7 +34,7 @@ def main():
 
     val_dataset = DataReader(img_dir=val_dir,
                              input='input',
-                             target='target',
+                             target='GT',
                              mode='test',
                              ori=False,
                              img_options={'w': 256, 'h': 256})

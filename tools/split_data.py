@@ -41,9 +41,9 @@ def split_and_copy_dataset(src_dir, input_subdir, target_subdir, train_dir, val_
 
     # 拷贝文件到训练集和验证集的目录
     copy_files(train_inp, train_dir, 'input')
-    copy_files(train_tar, train_dir, 'target')
+    copy_files(train_tar, train_dir, 'GT')
     copy_files(val_inp, val_dir, 'input')
-    copy_files(val_tar, val_dir, 'target')
+    copy_files(val_tar, val_dir, 'GT')
 
     print(f"数据集划分并拷贝完成：\n训练集：{len(train_inp)} 文件\n验证集：{len(val_inp)} 文件")
 

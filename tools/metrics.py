@@ -72,7 +72,7 @@ def main():
 
     model = mode.UNet().to(device)
     state_dict = torch.load(
-        r"E:\PythonProject\01_Personal\UnderwaterImageEnhanced\expt_record_HNUST\UNet\20250815_190500\best_result\TOP_PSNR.pth",
+        r"E:\PythonProject\01_Personal\UnderwaterImageEnhanced\expt_record_HNUST\UNet\20250817_221921\best_result\TOP_PSNR.pth",
         map_location=device,
     )
     model.load_state_dict(state_dict)
@@ -83,7 +83,7 @@ def main():
     val_dataset = DataReader(
         img_dir=val_dir,
         input='input',
-        target='target',
+        target='GT',
         mode='test',
         ori=False,
         img_options={'w': 256, 'h': 256}

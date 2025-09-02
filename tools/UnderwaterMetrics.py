@@ -175,7 +175,7 @@ class UnderwaterMetrics:
 
     def compute_metrics(self, pred, target=None):
         """
-        pred,target: tensor [3,H,W], float [0,1]
+        pred,GT: tensor [3,H,W], float [0,1]
         target可以为None，只计算无参考指标
         返回指标字典
         """
@@ -202,7 +202,7 @@ class UnderwaterMetrics:
             gray_target = cv2.cvtColor(target_np, cv2.COLOR_RGB2GRAY)
             result['PCQI'] = compute_pcqi(gray_target, gray_pred)
             result['CBPD'] = compute_cbpd(gray_pred, gray_target)
-            # result['FID'] = self.fid_calc.compute_fid(pred, target)
+            # result['FID'] = self.fid_calc.compute_fid(pred, GT)
             result['LPIPS'] = self.compute_lpips(pred, target)
 
         return result

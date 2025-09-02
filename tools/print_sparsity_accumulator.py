@@ -18,7 +18,7 @@ def print_sparsity():
 
     val_dataset = DataReader(img_dir=r'E:\PythonProject\01_Personal\UnderwaterImageEnhanced\dataset\LSUI19\Val',
                              input='input',
-                             target='target',
+                             target='GT',
                              mode='test',
                              ori=False,
                              img_options={'w': 256, 'h': 256})

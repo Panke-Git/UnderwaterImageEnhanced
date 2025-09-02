@@ -56,7 +56,7 @@ with torch.no_grad():
     for _, data in enumerate(tqdm(val_loader)):
         inp, target = data[0].to(device), data[1].to(device)
         # inp = inp.to(device)  # [1, 3, H, W]
-        # target = target.to(device)  # [1, 3, H, W]
+        # GT = GT.to(device)  # [1, 3, H, W]
         pred = model(inp)  # 你的模型输出，应该 shape 和 inp 一致
         # print(pred.shape)
 
