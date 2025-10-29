@@ -24,9 +24,9 @@ def main():
     # ----------------- 初始化模型 -----------------
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     print(device)
-    model = mode.UNetHybridAttentionV23_2().to(device)
+    model = mode.UNetHybridAttentionV23_2_NoThreshold().to(device)
     model.load_state_dict(torch.load(
-        r"E:\PythonProject\01_Personal\UnderwaterImageEnhanced\expt_record_HNUST\UNetHybridAttentionV23_2\20250815_190547\best_result\TOP_PSNR.pth",
+        r"E:\PythonProject\01_Personal\UnderwaterImageEnhanced\expt_record_HNUST\UNetHybridAttentionV23_2_NoThreshold\20250817_222332\best_result\TOP_PSNR.pth",
         map_location=device))
     model.eval()
 
