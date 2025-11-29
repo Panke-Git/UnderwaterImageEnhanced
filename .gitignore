@@ -184,3 +184,4 @@ cython_debug/
 /tools/img/
 /tools/2648.jpg
 /expt_record_HNUST
+.DS_Store

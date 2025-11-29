@@ -78,8 +78,8 @@ def train():
     # ========================================================================================
     # ==================================注意修改此值============================================
     # ========================================================================================
-    model = models.UNetHybridAttentionV23_2().to(device)
-    model_description = '基于UNetHybridAttentionV23，将HybridAttention前边加入卷积；'
+    model = models.INN_UNet().to(device)
+    model_description = '三分枝的隐式神经网络输入到Unet里边；'
     model_name = model.model_name
     # model_name = 'UNetHybridAttentionV23_2'
     expt_id = generate_experiment_id(model=model_name,

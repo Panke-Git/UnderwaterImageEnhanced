@@ -73,12 +73,6 @@ class UNet(nn.Module):
         x3 = self.enc3(self.pool2(x2))
         x4 = self.enc4(self.pool3(x3))
 
-        # Bottleneck
-        # print(x4.shape)
-        # x4 = MPNCOV.CovpoolLayer(x4)
-        # x4 = x4.view(x4.size(0), x4.size(1), x4.size(2), 1).contiguous()
-        # print(x4.shape)
-
         x5 = self.bottleneck(self.pool4(x4))
 
         # Decoder
