@@ -19,6 +19,7 @@ from skimage.metrics import structural_similarity as compare_ssim
 
 from data.dataset import DataReader
 import models
+import models.job2_1 as job2_1
 from models import LargeKernel as lk
 from utils import record_utils
 from utils.config import Config
@@ -78,8 +79,8 @@ def train():
     # ========================================================================================
     # ==================================注意修改此值============================================
     # ========================================================================================
-    model = models.INN_UNet().to(device)
-    model_description = '三分枝的隐式神经网络输入到Unet里边；'
+    model = job2_1.INN_UNetV2().to(device)
+    model_description = ('NRN的网络中只有色彩空间')
     model_name = model.model_name
     # model_name = 'UNetHybridAttentionV23_2'
     expt_id = generate_experiment_id(model=model_name,

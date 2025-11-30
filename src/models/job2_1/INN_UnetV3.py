@@ -1,7 +1,12 @@
-import math
+"""
+    @Project: UnderwaterImageEnhanced
+    @Author: Panke
+    @FileName: INN_UnetV3.py
+    @Time: 2025/11/29 23:45
+    @Email: None
+"""
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 from .block.ColorStructureEncoder import ColorStructureEncoder
 from .block.SIREN import SirenNet
 from .block.ECANet import ECALayer
@@ -119,12 +124,14 @@ class SirenColorECAOnlyBlock(nn.Module):
         )
 
         # ECA 作用在 [SIREN, Color] concat 后的通道上
-        self.total_fuse_channels = siren_hidden + color_channels
+        # self.total_fuse_channels = siren_hidden + color_channels
+        self.total_fuse_channels = siren_hidden
         self.eca = ECALayer(self.total_fuse_channels, k_size=eca_k_size)
 
         # ECA 输出 B_feat 再与 SIREN 特征 concat 之后的通道数：
         # C_concat2 = C_B + C_siren = (siren_hidden + color_channels) + siren_hidden
         self.mlp_in_channels = self.total_fuse_channels + siren_hidden
+        print(self.mlp_in_channels)
 
         # 逐像素 MLP：对 [B, feat_siren] 做映射到 out_channels
         self.pixel_mlp = PixelMLP(
@@ -164,8 +171,8 @@ class SirenColorECAOnlyBlock(nn.Module):
         feat_siren = siren_out.view(B, H, W, Cs).permute(0, 3, 1, 2)           # (B,Cs,H,W)
 
         # ---------- 3) 第一次 concat + ECA 得到 B ----------
-        fuse1 = torch.cat([feat_siren, feat_color], dim=1)                     # (B,Cs+Cc,H,W)
-        B_feat = self.eca(fuse1)                                               # (B,Cs+Cc,H,W)
+        # fuse1 = torch.cat([feat_siren, feat_color], dim=1)                     # (B,Cs+Cc,H,W)
+        B_feat = self.eca(feat_siren)                                               # (B,Cs+Cc,H,W)
 
         # ---------- 4) 第二次 concat: [B, SIREN] → MLP ----------
         fuse2 = torch.cat([B_feat, feat_siren], dim=1)                         # (B,Cs+Cc+Cs,H,W)
@@ -194,10 +201,10 @@ class ConvBlock(nn.Module):
         return self.double_conv(x)
 
 
-class INN_UNetV1(nn.Module):
+class INN_UNetV3(nn.Module):
     def __init__(self, in_channels=3, out_channels=3, base_c=64):
-        super(INN_UNetV1, self).__init__()
-        self.model_name = 'INN_UNetV1'
+        super(INN_UNetV3, self).__init__()
+        self.model_name = 'INN_UNetV3'
 
         self.per_model = SirenColorECAOnlyBlock(siren_hidden=64, siren_layers=3, color_channels=9, eca_k_size=3,mlp_hidden=(256,256), out_channels=3)
 
@@ -261,35 +268,3 @@ class INN_UNetV1(nn.Module):
         out = torch.sigmoid(out)  # Normalize output to [0,1]
         return out
 
-
-
-def test_siren_color_eca_only_block():
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    print("Using device:", device)
-
-    model = SirenColorECAOnlyBlock(
-        siren_hidden=64,
-        siren_layers=3,
-        color_channels=9,        # 与 ColorStructureEncoder 输出一致
-        eca_k_size=3,
-        mlp_hidden=(256, 256),
-        out_channels=3
-    ).to(device)
-
-    model.eval()
-    x = torch.randn(1, 3, 256, 256, device=device)
-
-    with torch.no_grad():
-        out, B_feat, feat_siren = model(x)
-
-    print("x shape:         ", x.shape)
-    print("out shape:       ", out.shape)         # 期望 (1,3,256,256)
-    print("B_feat shape:    ", B_feat.shape)      # (1,Cs+Cc,256,256)
-    print("feat_siren shape:", feat_siren.shape)  # (1,Cs,256,256)
-
-    assert out.shape == (1, 3, 256, 256)
-    print("✅ SirenColorECAOnlyBlock forward OK")
-
-
-if __name__ == "__main__":
-    test_siren_color_eca_only_block()

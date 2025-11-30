@@ -9,8 +9,7 @@
 import math
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
-from .block.ColorStructureEncoder import ColorStructureEncoder
+from .block import ColorStructureEncoder
 from .block.SIREN import SirenNet
 from .block.ECANet import ECALayer
 

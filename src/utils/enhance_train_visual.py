@@ -13,7 +13,7 @@ import torch
 from torch.utils.data import DataLoader
 
 from data.dataset import DataReader
-from models.Unet_CSC import UNet_CSC
+# from models.Unet_CSC import UNet_CSC
 
 
 def tensor_to_img(tensor):
