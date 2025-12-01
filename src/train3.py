@@ -18,7 +18,7 @@ from skimage.metrics import peak_signal_noise_ratio as compare_psnr
 from skimage.metrics import structural_similarity as compare_ssim
 
 from data.dataset import DataReader
-import models
+import models.job2_1 as job2_1
 from models import LargeKernel as lk
 from utils import record_utils
 from utils.config import Config
@@ -78,12 +78,12 @@ def train():
     # ========================================================================================
     # ==================================注意修改此值============================================
     # ========================================================================================
-    model = models.UNetHybridAttentionV23_2().to(device)
-    model_description = '基于UNetHybridAttentionV23，将HybridAttention前边加入卷积；'
+    model = job2_1.INN_UNetV4().to(device)
+    model_description = '单独再色彩空间之后加了两重卷积'
     model_name = model.model_name
     # model_name = 'UNetHybridAttentionV23_2'
     expt_id = generate_experiment_id(model=model_name,
-                                     dataset='UIEB19',
+                                     dataset='LSUI19',
                                      loss='SmoothL1Loss',
                                      note='')
     # ========================================================================================

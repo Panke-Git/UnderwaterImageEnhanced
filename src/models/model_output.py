@@ -18,7 +18,7 @@ input_tensor = torch.randn(B, 3, 256, 256)
 
 print(f"输入张量的形状: {input_tensor.shape}")
 
-model = job2_1.INN_UNetV2()
+model = job2_1.INN_UNetV4()
 
 # 4. 前向传播 (Forward Pass)
 # 为了测试通常不需要计算梯度，使用 torch.no_grad() 可以节省内存
