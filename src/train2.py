@@ -79,8 +79,8 @@ def train():
     # ========================================================================================
     # ==================================注意修改此值============================================
     # ========================================================================================
-    model = job2_1.INN_UNetV3().to(device)
-    model_description = 'NRN的网络中只有SIREN'
+    model = job2_1.INN_UNetV5().to(device)
+    model_description = 'NRN的网络中只有色彩空间，并且加了两层卷积，两层卷积的kernel都为1,然后色彩空间,色彩空间的卷积激活函数为SiLU()'
     model_name = model.model_name
     # model_name = 'UNetHybridAttentionV23_2'
     expt_id = generate_experiment_id(model=model_name,

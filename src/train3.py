@@ -78,8 +78,8 @@ def train():
     # ========================================================================================
     # ==================================注意修改此值============================================
     # ========================================================================================
-    model = job2_1.INN_UNetV4().to(device)
-    model_description = '单独再色彩空间之后加了两重卷积'
+    model = job2_1.INN_UNetV1().to(device)
+    model_description = '使用色彩空间然后和siren的输出concat之后送入到eca，将eca的输出和siren的输出conat之后送入到mlp中去；'
     model_name = model.model_name
     # model_name = 'UNetHybridAttentionV23_2'
     expt_id = generate_experiment_id(model=model_name,

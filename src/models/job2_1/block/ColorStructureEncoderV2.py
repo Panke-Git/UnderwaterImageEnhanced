@@ -73,7 +73,7 @@ class WavePool(nn.Module):
 
 
 
-class ColorStructureEncoder(nn.Module):
+class ColorStructureEncoderV2(nn.Module):
     """
     输入:  x: (B,3,H_in,W_in) 例如 (B,3,256,256)
     内部:
@@ -87,7 +87,7 @@ class ColorStructureEncoder(nn.Module):
     """
 
     def __init__(self, use_wavepool=True):
-        super(ColorStructureEncoder, self).__init__()
+        super(ColorStructureEncoderV2, self).__init__()
         self.use_wavepool = use_wavepool
         if use_wavepool:
             self.wave = WavePool(3)  # 你原来的小波池化类
@@ -121,7 +121,8 @@ class ColorStructureEncoder(nn.Module):
             ll_hsv = cv2.cvtColor(ll, cv2.COLOR_RGB2HSV)
 
             # 通道拼接: (H_ll,W_ll,9)
-            stru = np.concatenate([ll_rgb, ll_lab, ll_hsv], axis=-1)
+            # stru = np.concatenate([ll_rgb, ll_lab, ll_hsv], axis=-1)
+            stru = np.concatenate([ll_rgb, ll_lab], axis=-1)
 
             # 转为 tensor: (9,H_ll,W_ll)
             stru = torch.from_numpy(stru).permute(2, 0, 1)  # C,H,W

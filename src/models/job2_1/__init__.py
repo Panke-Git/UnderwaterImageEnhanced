@@ -10,6 +10,7 @@ from .INN_Unet import INN_UNet
 from .INN_UnetV2 import INN_UNetV2
 from .INN_UnetV3 import INN_UNetV3
 from .INN_UnetV4 import INN_UNetV4
+from .INN_UnetV5 import INN_UNetV5
 
 
 
@@ -18,5 +19,6 @@ __all__ = ['INN_UNetV1',
            'INN_UNet',
            'INN_UNetV2',
            'INN_UnetV3',
-           'INN_UNetV4'
+           'INN_UNetV4',
+           'INN_UNetV5'
            ]

@@ -65,8 +65,6 @@ class PixelMLP(nn.Module):
             last = h
         layers.append(nn.Linear(last, out_dim))
         self.net = nn.Sequential(*layers)
-        print(self.net)
-
     def forward(self, x):
         B, C, H, W = x.shape
         x = x.permute(0, 2, 3, 1).reshape(B * H * W, C)  # (BHW,C)

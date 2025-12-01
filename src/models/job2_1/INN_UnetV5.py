@@ -8,6 +8,7 @@
 import torch
 import torch.nn as nn
 from .block.ColorStructureEncoder import ColorStructureEncoder
+from .block.ColorStructureEncoderV2 import ColorStructureEncoderV2
 from .block.SIREN import SirenNet
 from .block.ECANet import ECALayer
 
@@ -103,14 +104,14 @@ class SirenColorECAOnlyBlock(nn.Module):
     def __init__(self,
                  siren_hidden=64,
                  siren_layers=3,
-                 color_channels=9,  # ColorStructureEncoder 输出通道数
+                 color_channels=6,  # ColorStructureEncoder 输出通道数
                  eca_k_size=3,
                  mlp_hidden=(256, 256),
                  out_channels=3):
         super(SirenColorECAOnlyBlock, self).__init__()
 
         # 假设你已经实现好了这个类：输出 (B,color_channels,H,W)
-        self.color_enc = ColorStructureEncoder(use_wavepool=True)
+        self.color_enc = ColorStructureEncoderV2(use_wavepool=True)
 
         # SIREN：输入 5 维 (RGB 3 + coord 2)，输出 siren_hidden 通道
         # self.siren = SirenNet(
@@ -213,12 +214,12 @@ class ConvBlock(nn.Module):
         return self.double_conv(x)
 
 
-class INN_UNetV4(nn.Module):
+class INN_UNetV5(nn.Module):
     def __init__(self, in_channels=3, out_channels=3, base_c=64):
-        super(INN_UNetV4, self).__init__()
-        self.model_name = 'INN_UNetV4'
+        super(INN_UNetV5, self).__init__()
+        self.model_name = 'INN_UNetV5'
 
-        self.per_model = SirenColorECAOnlyBlock(siren_hidden=64, siren_layers=3, color_channels=9, eca_k_size=3,
+        self.per_model = SirenColorECAOnlyBlock(siren_hidden=64, siren_layers=3, color_channels=6, eca_k_size=3,
                                                 mlp_hidden=(256, 256), out_channels=3)
 
         # Down path
