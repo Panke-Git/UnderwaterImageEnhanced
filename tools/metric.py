@@ -18,7 +18,7 @@ from src.data.dataset import DataReader
 import numpy as np
 
 # ✅ 替换为你的模型类
-from src import models as mode  # 请根据你实际模型路径修改
+from src.models import job1_1 as mode  # 请根据你实际模型路径修改
 
 def main():
     # ----------------- 初始化模型 -----------------

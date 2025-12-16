@@ -43,6 +43,7 @@ from .Unet_HybridAttention_V8 import UNetHybridAttentionV8
 from .Unet_HybridAttention_V9 import UNetHybridAttentionV9
 from .Unet_HybridAttention_V20 import UNetHybridAttentionV20
 from .Unet_HybridAttention_V23_2 import UNetHybridAttentionV23_2
+from .Unet_HybridAttention_V30 import UNetHybridAttentionV30
 
 __all__ = ['UNet',
            'Unet_CSC',
@@ -80,4 +81,5 @@ __all__ = ['UNet',
            'UNetHybridAttentionV23_2_NoThreshold',
            'UNetHybridAttentionV23_2_Ablation1',
            'UNetHybridAttentionV23_2_Ablation2',
-           'UNetHybridAttentionV23_2_Ablation3']
+           'UNetHybridAttentionV23_2_Ablation3',
+           'UNetHybridAttentionV30']
