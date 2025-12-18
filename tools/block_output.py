@@ -6,27 +6,27 @@
     @Email: None
 """
 
-from src import models
+# from src import models
+import src.models.job1_1 as job1_1
+import torch
+# from src.utils.enhance_train_visual import visual_enhance
 
-from src.models.Unet_HybridAttention import HybridAttention
-from src.utils.enhance_train_visual import visual_enhance
+
+x = torch.randn(1, 3, 256, 256).to(torch.device('cuda:0'))
+
+# block = CSC_block(3)
+unet = job1_1.UNetHybridAttentionV31().to(torch.device('cuda:0'))
+
+# net = lk.UNetCSC_LKA_SDCA_FDPA().to(torch.device('cuda:0'))
 
 
-# x = torch.randn(1, 3, 256, 256).to(torch.device('cuda:0'))
-#
-# # block = CSC_block(3)
-# unet = models.UNet().to(torch.device('cuda:0'))
-#
-# # net = lk.UNetCSC_LKA_SDCA_FDPA().to(torch.device('cuda:0'))
-#
-#
-# # print(x.shape)
-# out = unet(x)
-# # print(out.shape)
+# print(x.shape)
+out = unet(x)
+print(out.shape)
 
-img_path = r'C:\Users\Panke\Desktop\UIR_IMG'
-model= models.UNetHybridAttentionV23()
-visual_enhance(model, r'E:\PythonProject\01_Personal\UnderwaterImageEnhanced\expt_record\UNetHybridAttentionV23\20250610_000143', img_path)
+# img_path = r'C:\Users\Panke\Desktop\UIR_IMG'
+# model= models.UNetHybridAttentionV23()
+# visual_enhance(model, r'E:\PythonProject\01_Personal\UnderwaterImageEnhanced\expt_record\UNetHybridAttentionV23\20250610_000143', img_path)
 
 
 

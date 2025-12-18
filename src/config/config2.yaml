@@ -11,7 +11,6 @@ PROJECT:
   VISUAL_DATA: /public/home/hnust15874739861/pro/UnderwaterImageEnhanced/dataset/visual_img
 
 
-
 DATASET:
   INPUT: 'input'
   TARGET: 'GT'
